@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   PREMIUM NAVBAR
+================================ */
+
+.nav-link {
+    @apply relative text-gray-700 font-semibold tracking-wide transition-colors duration-300;
+}
+
+.nav-link:hover {
+    @apply text-blue-700;
+}
+
+.nav-link::after {
+    content: "";
+    @apply absolute left-0 -bottom-2 h-[2px] w-0 bg-blue-700 transition-all duration-300;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    @apply w-full;
+}
+
+.nav-link.active {
+    @apply text-blue-700;
+}
+
+/* ===============================
+   DROPDOWN
+================================ */
+
+.dropdown {
+    @apply absolute top-full left-0 mt-4 w-56 bg-white rounded-xl shadow-lg opacity-0 invisible translate-y-2 transition-all duration-300;
+}
+
+.group:hover .dropdown {
+    @apply opacity-100 visible translate-y-0;
+}
+
+.dropdown a {
+    @apply block px-5 py-3 text-sm text-gray-700 hover:bg-gray-100;
+}
+
+/* ===============================
+   MOBILE MENU
+================================ */
+
+#mobile-menu a {
+    @apply block py-3 text-gray-700 font-medium border-b hover:text-blue-700;
+}
