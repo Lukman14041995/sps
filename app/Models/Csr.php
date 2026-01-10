@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class Csr extends Model
 {
@@ -65,25 +65,25 @@ class Csr extends Model
     {
         return [
             'social' => [
-                'name' => 'Social',
-                'full_name' => 'Social Responsibility',
-                'description' => 'Program untuk kesejahteraan masyarakat dan pengembangan komunitas',
-                'color' => '#3b82f6', // Blue
-                'icon' => 'users',
+                'name' => 'Sosial',
+                'description' => 'Program untuk meningkatkan kesejahteraan masyarakat',
+                'icon' => '👥',
+                'bg_color' => 'bg-blue-100',
+                'text_color' => 'text-blue-700',
             ],
             'environment' => [
-                'name' => 'Environment',
-                'full_name' => 'Environmental Sustainability',
-                'description' => 'Program pelestarian lingkungan dan keberlanjutan ekosistem',
-                'color' => '#10b981', // Emerald
-                'icon' => 'leaf',
+                'name' => 'Lingkungan',
+                'description' => 'Program untuk menjaga kelestarian lingkungan',
+                'icon' => '🌱',
+                'bg_color' => 'bg-green-100',
+                'text_color' => 'text-green-700',
             ],
             'quality' => [
-                'name' => 'Quality',
-                'full_name' => 'Quality & Excellence',
-                'description' => 'Program peningkatan kualitas produk, layanan, dan proses',
-                'color' => '#8b5cf6', // Violet
-                'icon' => 'trophy',
+                'name' => 'Kualitas Hidup',
+                'description' => 'Program untuk meningkatkan kualitas hidup masyarakat',
+                'icon' => '⭐',
+                'bg_color' => 'bg-emerald-100',
+                'text_color' => 'text-emerald-700',
             ],
         ];
     }
@@ -94,6 +94,7 @@ class Csr extends Model
     public function getCategoryDetailsAttribute()
     {
         $categories = self::getCategories();
+
         return $categories[$this->category] ?? [
             'name' => ucfirst($this->category),
             'full_name' => ucfirst($this->category),
@@ -116,7 +117,7 @@ class Csr extends Model
      */
     public function getCategoryColorAttribute()
     {
-        return $this->categoryDetails['color'];
+        return $this->categoryDetails['color'] ?? '#6B7280';
     }
 
     /**
@@ -164,16 +165,16 @@ class Csr extends Model
      */
     public function getFormattedBudgetAttribute()
     {
-        if (!$this->budget) {
-            return 'Not specified';
+        if (! $this->budget) {
+            return 'Tidak tersedia';
         }
 
         if ($this->budget >= 1000000000) {
-            return 'Rp ' . number_format($this->budget / 1000000000, 1) . ' Miliar';
+            return 'Rp '.number_format($this->budget / 1000000000, 2).' Miliar';
         } elseif ($this->budget >= 1000000) {
-            return 'Rp ' . number_format($this->budget / 1000000, 1) . ' Juta';
+            return 'Rp '.number_format($this->budget / 1000000, 2).' Juta';
         } else {
-            return 'Rp ' . number_format($this->budget, 0, ',', '.');
+            return 'Rp '.number_format($this->budget, 0, ',', '.');
         }
     }
 
@@ -182,12 +183,12 @@ class Csr extends Model
      */
     public function getFormattedBeneficiariesAttribute()
     {
-        if (!$this->beneficiaries_count) {
-            return 'Not specified';
+        if (! $this->beneficiaries_count) {
+            return 'Tidak tersedia';
         }
 
         if ($this->beneficiaries_count >= 1000) {
-            return number_format($this->beneficiaries_count / 1000, 1) . 'K';
+            return number_format($this->beneficiaries_count / 1000, 1).' Ribu';
         }
 
         return number_format($this->beneficiaries_count, 0, ',', '.');
@@ -199,7 +200,7 @@ class Csr extends Model
     public function getFeaturedImageUrlAttribute()
     {
         if ($this->featured_image) {
-            return asset('storage/' . $this->featured_image);
+            return Storage::disk('s3')->url($this->featured_image);
         }
 
         // Default images based on category
@@ -218,7 +219,7 @@ class Csr extends Model
     public function getThumbnailImageUrlAttribute()
     {
         if ($this->thumbnail_image) {
-            return asset('storage/' . $this->thumbnail_image);
+            return Storage::disk('s3')->url($this->thumbnail_image);
         }
 
         return $this->featured_image_url;
@@ -229,12 +230,12 @@ class Csr extends Model
      */
     public function getGalleryImagesUrlsAttribute()
     {
-        if (!$this->gallery_images) {
+        if (! $this->gallery_images) {
             return [];
         }
 
         return array_map(function ($image) {
-            return asset('storage/' . $image);
+            return Storage::disk('s3')->url($image);
         }, $this->gallery_images);
     }
 

@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Csr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class CsrController extends Controller
 {
@@ -17,9 +18,9 @@ class CsrController extends Controller
      */
     private function ensureDirectoryExists($path)
     {
-        $fullPath = storage_path('app/public/' . $path);
+        $fullPath = storage_path('app/public/'.$path);
 
-        if (!is_dir($fullPath)) {
+        if (! is_dir($fullPath)) {
             mkdir($fullPath, 0755, true);
         }
 
@@ -31,7 +32,7 @@ class CsrController extends Controller
      */
     private function uploadImage($file, $folder, $prefix = 'csr')
     {
-        if (!$file || !$file->isValid()) {
+        if (! $file || ! $file->isValid()) {
             return null;
         }
 
@@ -39,12 +40,12 @@ class CsrController extends Controller
         $this->ensureDirectoryExists($folder);
 
         // Generate unique filename
-        $filename = $prefix . '-' . time() . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $filename = $prefix.'-'.time().'-'.uniqid().'.'.$file->getClientOriginalExtension();
 
         // Simpan file
         $file->storeAs($folder, $filename, 'public');
 
-        return $folder . '/' . $filename;
+        return $folder.'/'.$filename;
     }
 
     /**
@@ -54,8 +55,10 @@ class CsrController extends Controller
     {
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
+
             return true;
         }
+
         return false;
     }
 
@@ -78,10 +81,39 @@ class CsrController extends Controller
                 'social' => Csr::byCategory('social')->count(),
                 'environment' => Csr::byCategory('environment')->count(),
                 'quality' => Csr::byCategory('quality')->count(),
-            ]
+            ],
         ];
 
         $categories = Csr::getCategories();
+        $categoryColors = [
+            'social' => [
+                'name' => 'Sosial',
+                'color' => '#3B82F6',
+                'light_color' => '#EFF6FF',
+            ],
+            'environment' => [
+                'name' => 'Lingkungan',
+                'color' => '#10B981',
+                'light_color' => '#ECFDF5',
+            ],
+            'quality' => [
+                'name' => 'Kualitas Hidup',
+                'color' => '#F59E0B',
+                'light_color' => '#FFFBEB',
+            ],
+        ];
+        $availableYears = Csr::select('year')
+            ->whereNotNull('year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year')
+            ->toArray();
+
+        foreach ($categories as $key => &$category) {
+            $category['color'] = $categoryColors[$key]['color'] ?? '#6B7280';
+            $category['light_color'] = $categoryColors[$key]['light_color'] ?? '#F3F4F6';
+        }
+
         $availableYears = Csr::select('year')
             ->whereNotNull('year')
             ->distinct()
@@ -120,7 +152,7 @@ class CsrController extends Controller
             'beneficiaries_count' => 'nullable|integer|min:0',
             'budget' => 'nullable|numeric|min:0',
             'location' => 'nullable|string|max:255',
-            'year' => 'nullable|integer|min:2000|max:' . date('Y'),
+            'year' => 'nullable|integer|min:2000|max:'.date('Y'),
             'duration' => 'nullable|string|max:100',
             'achievements' => 'nullable|string',
             'testimonials' => 'nullable|string',
@@ -133,43 +165,51 @@ class CsrController extends Controller
         ]);
 
         try {
-            // Handle featured image upload
-            if ($request->hasFile('featured_image')) {
-                $validated['featured_image'] = $this->uploadImage(
-                    $request->file('featured_image'),
-                    'csrs/featured',
-                    'csr-featured'
-                );
+            DB::beginTransaction();
+
+            /**
+             * ✅ FEATURED IMAGE (S3/MinIO)
+             */
+            if ($request->hasFile('featured_image') && $request->file('featured_image')->isValid()) {
+                $path = $request->file('featured_image')
+                    ->store('csr/featured-images', 's3');
+                $validated['featured_image'] = $path;
             }
 
-            // Handle thumbnail image upload
-            if ($request->hasFile('thumbnail_image')) {
-                $validated['thumbnail_image'] = $this->uploadImage(
-                    $request->file('thumbnail_image'),
-                    'csrs/thumbnails',
-                    'csr-thumbnail'
-                );
+            /**
+             * ✅ THUMBNAIL IMAGE (S3/MinIO)
+             */
+            if ($request->hasFile('thumbnail_image') && $request->file('thumbnail_image')->isValid()) {
+                $path = $request->file('thumbnail_image')
+                    ->store('csr/thumbnail-images', 's3');
+                $validated['thumbnail_image'] = $path;
             }
 
-            // Handle gallery images upload
+            /**
+             * ✅ GALLERY IMAGES (S3/MinIO)
+             */
+            $galleryPaths = [];
             if ($request->hasFile('gallery_images')) {
-                $galleryPaths = [];
                 foreach ($request->file('gallery_images') as $image) {
-                    $path = $this->uploadImage($image, 'csrs/gallery', 'csr-gallery');
-                    if ($path) {
-                        $galleryPaths[] = $path;
+                    if ($image->isValid()) {
+                        $path = $image->store('csr/gallery-images', 's3');
+                        if ($path) {
+                            $galleryPaths[] = $path;
+                        }
                     }
                 }
-                if (!empty($galleryPaths)) {
+                if (! empty($galleryPaths)) {
                     $validated['gallery_images'] = json_encode($galleryPaths);
                 }
             }
 
-            // Handle impact metrics (dari form modal)
+            /**
+             * ✅ IMPACT METRICS
+             */
             if ($request->has('impact_metrics')) {
                 $impactMetrics = [];
                 foreach ($request->input('impact_metrics', []) as $metric) {
-                    if (!empty($metric['name']) && !empty($metric['value'])) {
+                    if (! empty($metric['name']) && ! empty($metric['value'])) {
                         $impactMetrics[] = [
                             'name' => $metric['name'],
                             'value' => $metric['value'],
@@ -177,42 +217,48 @@ class CsrController extends Controller
                         ];
                     }
                 }
-                if (!empty($impactMetrics)) {
+                if (! empty($impactMetrics)) {
                     $validated['impact_metrics'] = json_encode($impactMetrics);
                 }
             }
 
-            // Handle team members (dari form modal)
+            /**
+             * ✅ TEAM MEMBERS
+             */
             if ($request->has('team_members')) {
                 $teamMembers = [];
                 foreach ($request->input('team_members', []) as $member) {
-                    if (!empty($member['name']) && !empty($member['role'])) {
+                    if (! empty($member['name']) && ! empty($member['role'])) {
                         $teamMembers[] = [
                             'name' => $member['name'],
                             'role' => $member['role'],
                         ];
                     }
                 }
-                if (!empty($teamMembers)) {
+                if (! empty($teamMembers)) {
                     $validated['team_members'] = json_encode($teamMembers);
                 }
             }
 
-            // Generate slug
+            /**
+             * ✅ SLUG GENERATION
+             */
             $validated['slug'] = Str::slug($validated['title']);
-
-            // Ensure unique slug
             $count = Csr::where('slug', $validated['slug'])->count();
             if ($count > 0) {
-                $validated['slug'] = $validated['slug'] . '-' . ($count + 1);
+                $validated['slug'] = $validated['slug'].'-'.($count + 1);
             }
 
-            // Set published_at if status is published
-            if ($validated['status'] === 'published' && empty($validated['published_at'])) {
+            /**
+             * ✅ PUBLISH DATE
+             */
+            if ($validated['status'] === 'published' && ! isset($validated['published_at'])) {
                 $validated['published_at'] = now();
             }
 
-            // Set default values
+            /**
+             * ✅ DEFAULT VALUES
+             */
             $validated['views'] = 0;
             $validated['likes'] = 0;
             $validated['shares'] = 0;
@@ -221,38 +267,46 @@ class CsrController extends Controller
                 $validated['sort_order'] = 0;
             }
 
-            // Set created_by
+            /**
+             * ✅ USER INFORMATION
+             */
             $validated['created_by'] = Auth::id();
             $validated['updated_by'] = Auth::id();
 
-            // Create the CSR program
+            /**
+             * ✅ CREATE CSR PROGRAM
+             */
             $csr = Csr::create($validated);
 
+            DB::commit();
+
             return redirect()->route('admin.csr.index')
-                ->with('success', 'CSR program "' . $validated['title'] . '" created successfully!')
+                ->with('success', 'CSR program "'.$validated['title'].'" created successfully!')
                 ->with('created_csr_id', $csr->id);
+
         } catch (\Exception $e) {
-            // Log error untuk debugging
-            Log::error('CSR Store Error: ' . $e->getMessage());
-            Log::error('Trace: ' . $e->getTraceAsString());
-            Log::error('Request Data: ', $request->all());
+            DB::rollBack();
+
+            // Log error
+            Log::error('CSR Store Error: '.$e->getMessage());
+            Log::error('Trace: '.$e->getTraceAsString());
 
             // Clean up uploaded files jika error
             if (isset($validated['featured_image'])) {
-                $this->deleteImageIfExists($validated['featured_image']);
+                Storage::disk('s3')->delete($validated['featured_image']);
             }
             if (isset($validated['thumbnail_image'])) {
-                $this->deleteImageIfExists($validated['thumbnail_image']);
+                Storage::disk('s3')->delete($validated['thumbnail_image']);
             }
-            if (isset($galleryPaths)) {
+            if (isset($galleryPaths) && is_array($galleryPaths)) {
                 foreach ($galleryPaths as $path) {
-                    $this->deleteImageIfExists($path);
+                    Storage::disk('s3')->delete($path);
                 }
             }
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Failed to create CSR program: ' . $e->getMessage());
+                ->with('error', 'Failed to create CSR program: '.$e->getMessage());
         }
     }
 
@@ -260,34 +314,143 @@ class CsrController extends Controller
      * Display the specified resource.
      */
     public function show(Csr $csr)
-{
-    $csr->load(['creator', 'updater']);
+    {
+        $csr->load(['creator', 'updater']);
 
-    // Decode JSON menjadi array agar aman
-    $csr->impact_metrics = $csr->impact_metrics ? json_decode($csr->impact_metrics, true) : [];
-    $csr->team_members = $csr->team_members ? json_decode($csr->team_members, true) : [];
-    $csr->gallery_images = $csr->gallery_images ? json_decode($csr->gallery_images, true) : [];
+        // Decode JSON menjadi array agar aman
+        $csr->impact_metrics = $csr->impact_metrics ? json_decode($csr->impact_metrics, true) : [];
+        $csr->team_members = $csr->team_members ? json_decode($csr->team_members, true) : [];
+        $csr->gallery_images = $csr->gallery_images ? json_decode($csr->gallery_images, true) : [];
 
-    return view('admin.csr.show', compact('csr'));
-}
-
+        return view('admin.csr.show', compact('csr'));
+    }
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(Csr $csr)
     {
-        $categories = collect(Csr::getCategories())->mapWithKeys(function ($value, $key) {
-    return [$key => $value['name'] ?? ucfirst($key)];
-})->toArray();
+        /**
+         * ===============================
+         * Categories
+         * ===============================
+         */
+        $categories = collect(Csr::getCategories())
+            ->mapWithKeys(function ($value, $key) {
+                return [$key => $value['name'] ?? ucfirst($key)];
+            })
+            ->toArray();
 
+        if (empty($categories)) {
+            $categories = [
+                'social' => ['name' => 'Social', 'color' => '#3B82F6'],
+                'environment' => ['name' => 'Environment', 'color' => '#10B981'],
+                'quality' => ['name' => 'Quality', 'color' => '#F59E0B'],
+            ];
+        }
+
+        /**
+         * ===============================
+         * Years
+         * ===============================
+         */
         $currentYear = date('Y');
         $years = range($currentYear, 2000);
 
-        return view('admin.csr.edit', compact('csr', 'categories', 'years'));
+        /**
+         * ===============================
+         * Gallery Images (NORMALIZED)
+         * Output: array of string path
+         * ===============================
+         */
+        $galleryImages = [];
+
+        if (! empty($csr->gallery_images)) {
+            $raw = $csr->gallery_images;
+
+            // Kalau sudah dicast array oleh model
+            if (is_array($raw)) {
+                $decoded = $raw;
+            } else {
+                // Kalau masih string JSON
+                $decoded = json_decode($raw, true);
+            }
+
+            if (is_array($decoded)) {
+                foreach ($decoded as $img) {
+                    if (is_string($img)) {
+                        $galleryImages[] = $img;
+                    } elseif (is_array($img)) {
+                        // Ambil path kalau ada
+                        if (! empty($img['path'])) {
+                            $galleryImages[] = $img['path'];
+                        } else {
+                            // fallback ambil value pertama
+                            $first = reset($img);
+                            if (is_string($first)) {
+                                $galleryImages[] = $first;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         * ===============================
+         * Impact Metrics (NORMALIZED)
+         * ===============================
+         */
+        $impactMetrics = [];
+
+        if (! empty($csr->impact_metrics)) {
+            $raw = $csr->impact_metrics;
+
+            if (is_array($raw)) {
+                $impactMetrics = $raw;
+            } else {
+                $decoded = json_decode($raw, true);
+                $impactMetrics = is_array($decoded) ? $decoded : [];
+            }
+        }
+
+        // Jika ada old input (validasi gagal)
+        if (old('impact_metrics')) {
+            $impactMetrics = old('impact_metrics');
+        }
+
+        /**
+         * ===============================
+         * Team Members (NORMALIZED)
+         * ===============================
+         */
+        $teamMembers = [];
+
+        if (! empty($csr->team_members)) {
+            $raw = $csr->team_members;
+
+            if (is_array($raw)) {
+                $teamMembers = $raw;
+            } else {
+                $decoded = json_decode($raw, true);
+                $teamMembers = is_array($decoded) ? $decoded : [];
+            }
+        }
+
+        if (old('team_members')) {
+            $teamMembers = old('team_members');
+        }
+
+        return view('admin.csr.edit', compact(
+            'csr',
+            'categories',
+            'years',
+            'galleryImages',
+            'impactMetrics',
+            'teamMembers'
+        ));
     }
 
-   
     /**
      * Update the specified resource in storage.
      */
@@ -304,7 +467,7 @@ class CsrController extends Controller
             'beneficiaries_count' => 'nullable|integer|min:0',
             'budget' => 'nullable|numeric|min:0',
             'location' => 'nullable|string|max:255',
-            'year' => 'nullable|integer|min:2000|max:' . date('Y'),
+            'year' => 'nullable|integer|min:2000|max:'.date('Y'),
             'duration' => 'nullable|string|max:100',
             'achievements' => 'nullable|string',
             'testimonials' => 'nullable|string',
@@ -315,71 +478,103 @@ class CsrController extends Controller
             'status' => 'required|in:draft,published,archived',
             'sort_order' => 'nullable|integer',
         ]);
+        // dd($validated);
 
         try {
-            // Handle featured image upload
-            if ($request->hasFile('featured_image')) {
-                // Delete old image
-                $this->deleteImageIfExists($csr->featured_image);
+            DB::beginTransaction();
 
-                // Upload new image
-                $validated['featured_image'] = $this->uploadImage(
-                    $request->file('featured_image'),
-                    'csrs/featured',
-                    'csr-featured'
-                );
+            // Simpan data gambar lama
+            $oldFeaturedImage = $csr->featured_image;
+            $oldThumbnailImage = $csr->thumbnail_image;
+            $oldGalleryImages = $csr->gallery_images ? json_decode($csr->gallery_images, true) : [];
+
+            /**
+             * ✅ FEATURED IMAGE UPDATE (S3/MinIO)
+             */
+            if ($request->hasFile('featured_image') && $request->file('featured_image')->isValid()) {
+                // Upload gambar baru
+                $path = $request->file('featured_image')
+                    ->store('csr/featured-images', 's3');
+                $validated['featured_image'] = $path;
+
+                // Hapus gambar lama dari S3
+                if ($oldFeaturedImage && Storage::disk('s3')->exists($oldFeaturedImage)) {
+                    Storage::disk('s3')->delete($oldFeaturedImage);
+                }
+            } elseif ($request->has('remove_featured_image')) {
+                // Hapus gambar jika checkbox dicentang
+                if ($oldFeaturedImage && Storage::disk('s3')->exists($oldFeaturedImage)) {
+                    Storage::disk('s3')->delete($oldFeaturedImage);
+                }
+                $validated['featured_image'] = null;
             } else {
-                // Keep old image
-                unset($validated['featured_image']);
+                // Tetap gunakan gambar lama
+                $validated['featured_image'] = $oldFeaturedImage;
             }
 
-            // Handle thumbnail image upload
-            if ($request->hasFile('thumbnail_image')) {
-                // Delete old image
-                $this->deleteImageIfExists($csr->thumbnail_image);
+            /**
+             * ✅ THUMBNAIL IMAGE UPDATE (S3/MinIO)
+             */
+            if ($request->hasFile('thumbnail_image') && $request->file('thumbnail_image')->isValid()) {
+                // Upload gambar baru
+                $path = $request->file('thumbnail_image')
+                    ->store('csr/thumbnail-images', 's3');
+                $validated['thumbnail_image'] = $path;
 
-                // Upload new image
-                $validated['thumbnail_image'] = $this->uploadImage(
-                    $request->file('thumbnail_image'),
-                    'csrs/thumbnails',
-                    'csr-thumbnail'
-                );
+                // Hapus gambar lama dari S3
+                if ($oldThumbnailImage && Storage::disk('s3')->exists($oldThumbnailImage)) {
+                    Storage::disk('s3')->delete($oldThumbnailImage);
+                }
             } else {
-                // Keep old image
-                unset($validated['thumbnail_image']);
+                // Tetap gunakan gambar lama
+                $validated['thumbnail_image'] = $oldThumbnailImage;
             }
 
-            // Handle gallery images upload
+            /**
+             * ✅ GALLERY IMAGES UPDATE (S3/MinIO)
+             */
+            $galleryPaths = $oldGalleryImages;
+
+            // Hapus gambar yang dipilih
+            if ($request->has('remove_gallery_images')) {
+                $imagesToRemove = $request->input('remove_gallery_images', []);
+                foreach ($imagesToRemove as $imagePath) {
+                    if ($imagePath && Storage::disk('s3')->exists($imagePath)) {
+                        Storage::disk('s3')->delete($imagePath);
+                    }
+                    $key = array_search($imagePath, $galleryPaths);
+                    if ($key !== false) {
+                        unset($galleryPaths[$key]);
+                    }
+                }
+                $galleryPaths = array_values($galleryPaths); // Reindex array
+            }
+
+            // Tambah gambar baru
             if ($request->hasFile('gallery_images')) {
-                // Delete old gallery images
-                if ($csr->gallery_images) {
-                    $oldGallery = json_decode($csr->gallery_images, true);
-                    foreach ($oldGallery as $oldImage) {
-                        $this->deleteImageIfExists($oldImage);
-                    }
-                }
-
-                // Upload new gallery images
-                $galleryPaths = [];
                 foreach ($request->file('gallery_images') as $image) {
-                    $path = $this->uploadImage($image, 'csrs/gallery', 'csr-gallery');
-                    if ($path) {
-                        $galleryPaths[] = $path;
+                    if ($image->isValid()) {
+                        $path = $image->store('csr/gallery-images', 's3');
+                        if ($path) {
+                            $galleryPaths[] = $path;
+                        }
                     }
                 }
-                if (!empty($galleryPaths)) {
-                    $validated['gallery_images'] = json_encode($galleryPaths);
-                }
-            } elseif ($request->has('keep_gallery_images')) {
-                // Keep existing gallery images
-                $validated['gallery_images'] = $csr->gallery_images;
             }
 
-            // Handle impact metrics
+            if (! empty($galleryPaths)) {
+                $validated['gallery_images'] = json_encode($galleryPaths);
+            } else {
+                $validated['gallery_images'] = null;
+            }
+
+            /**
+             * ✅ IMPACT METRICS
+             */
             if ($request->has('impact_metrics')) {
                 $impactMetrics = [];
                 foreach ($request->input('impact_metrics', []) as $metric) {
-                    if (!empty($metric['name']) && !empty($metric['value'])) {
+                    if (! empty($metric['name']) && ! empty($metric['value'])) {
                         $impactMetrics[] = [
                             'name' => $metric['name'],
                             'value' => $metric['value'],
@@ -387,59 +582,82 @@ class CsrController extends Controller
                         ];
                     }
                 }
-                $validated['impact_metrics'] = !empty($impactMetrics) ? json_encode($impactMetrics) : null;
+                $validated['impact_metrics'] = ! empty($impactMetrics) ? json_encode($impactMetrics) : null;
+            } else {
+                $validated['impact_metrics'] = null;
             }
 
-            // Handle team members
+            /**
+             * ✅ TEAM MEMBERS
+             */
             if ($request->has('team_members')) {
                 $teamMembers = [];
                 foreach ($request->input('team_members', []) as $member) {
-                    if (!empty($member['name']) && !empty($member['role'])) {
+                    if (! empty($member['name']) && ! empty($member['role'])) {
                         $teamMembers[] = [
                             'name' => $member['name'],
                             'role' => $member['role'],
                         ];
                     }
                 }
-                $validated['team_members'] = !empty($teamMembers) ? json_encode($teamMembers) : null;
+                $validated['team_members'] = ! empty($teamMembers) ? json_encode($teamMembers) : null;
+            } else {
+                $validated['team_members'] = null;
             }
 
-            // Generate slug if title changed
+            /**
+             * ✅ SLUG UPDATE (jika title berubah)
+             */
             if ($csr->title !== $validated['title']) {
                 $validated['slug'] = Str::slug($validated['title']);
 
-                // Ensure unique slug
+                // Pastikan slug unik
                 $count = Csr::where('slug', $validated['slug'])
                     ->where('id', '!=', $csr->id)
                     ->count();
-
                 if ($count > 0) {
-                    $validated['slug'] = $validated['slug'] . '-' . ($count + 1);
+                    $validated['slug'] = $validated['slug'].'-'.($count + 1);
                 }
+            } else {
+                $validated['slug'] = $csr->slug;
             }
 
-            // Set published_at if status changed to published
+            /**
+             * ✅ PUBLISH DATE UPDATE
+             */
             if ($validated['status'] === 'published' && $csr->status !== 'published') {
                 $validated['published_at'] = now();
+            } elseif ($validated['status'] !== 'published') {
+                $validated['published_at'] = null;
+            } else {
+                $validated['published_at'] = $csr->published_at;
             }
 
-            // Set updated_by
+            /**
+             * ✅ UPDATE USER INFORMATION
+             */
             $validated['updated_by'] = Auth::id();
 
-            // Update CSR
+            /**
+             * ✅ UPDATE CSR PROGRAM
+             */
             $csr->update($validated);
 
+            DB::commit();
+
             return redirect()->route('admin.csr.index')
-                ->with('success', 'CSR program updated successfully.');
+                ->with('success', 'CSR program "'.$validated['title'].'" updated successfully!');
+
         } catch (\Exception $e) {
+            DB::rollBack();
+
             // Log error
-            Log::error('CSR Update Error: ' . $e->getMessage());
-            Log::error('Trace: ' . $e->getTraceAsString());
-            Log::error('Request Data: ', $request->all());
+            Log::error('CSR Update Error: '.$e->getMessage());
+            Log::error('Trace: '.$e->getTraceAsString());
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Failed to update CSR program: ' . $e->getMessage());
+                ->with('error', 'Failed to update CSR program: '.$e->getMessage());
         }
     }
 
@@ -467,11 +685,11 @@ class CsrController extends Controller
             return redirect()->route('admin.csr.index')
                 ->with('success', 'CSR program deleted successfully.');
         } catch (\Exception $e) {
-            Log::error('CSR Delete Error: ' . $e->getMessage());
-            Log::error('Trace: ' . $e->getTraceAsString());
+            Log::error('CSR Delete Error: '.$e->getMessage());
+            Log::error('Trace: '.$e->getTraceAsString());
 
             return redirect()->back()
-                ->with('error', 'Failed to delete CSR program: ' . $e->getMessage());
+                ->with('error', 'Failed to delete CSR program: '.$e->getMessage());
         }
     }
 
@@ -511,7 +729,7 @@ class CsrController extends Controller
                     Csr::whereIn('id', $validated['ids'])->update([
                         'status' => 'published',
                         'published_at' => now(),
-                        'updated_by' => Auth::id()
+                        'updated_by' => Auth::id(),
                     ]);
                     $message = 'Selected CSR programs published successfully.';
                     break;
@@ -519,7 +737,7 @@ class CsrController extends Controller
                 case 'archive':
                     Csr::whereIn('id', $validated['ids'])->update([
                         'status' => 'archived',
-                        'updated_by' => Auth::id()
+                        'updated_by' => Auth::id(),
                     ]);
                     $message = 'Selected CSR programs archived successfully.';
                     break;
@@ -527,11 +745,11 @@ class CsrController extends Controller
 
             return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
-            Log::error('CSR Bulk Action Error: ' . $e->getMessage());
-            Log::error('Trace: ' . $e->getTraceAsString());
+            Log::error('CSR Bulk Action Error: '.$e->getMessage());
+            Log::error('Trace: '.$e->getTraceAsString());
 
             return redirect()->back()
-                ->with('error', 'Failed to perform bulk action: ' . $e->getMessage());
+                ->with('error', 'Failed to perform bulk action: '.$e->getMessage());
         }
     }
 
@@ -546,7 +764,7 @@ class CsrController extends Controller
             $csr->update([
                 'status' => $newStatus,
                 'published_at' => $newStatus === 'published' ? now() : $csr->published_at,
-                'updated_by' => Auth::id()
+                'updated_by' => Auth::id(),
             ]);
 
             $statusText = $newStatus === 'published' ? 'published' : 'unpublished';
@@ -554,11 +772,11 @@ class CsrController extends Controller
             return redirect()->back()
                 ->with('success', "CSR program {$statusText} successfully.");
         } catch (\Exception $e) {
-            Log::error('CSR Toggle Status Error: ' . $e->getMessage());
-            Log::error('Trace: ' . $e->getTraceAsString());
+            Log::error('CSR Toggle Status Error: '.$e->getMessage());
+            Log::error('Trace: '.$e->getTraceAsString());
 
             return redirect()->back()
-                ->with('error', 'Failed to toggle status: ' . $e->getMessage());
+                ->with('error', 'Failed to toggle status: '.$e->getMessage());
         }
     }
 
@@ -569,8 +787,8 @@ class CsrController extends Controller
     {
         try {
             $newCsr = $csr->replicate();
-            $newCsr->title = $csr->title . ' (Copy)';
-            $newCsr->slug = Str::slug($newCsr->title) . '-' . time();
+            $newCsr->title = $csr->title.' (Copy)';
+            $newCsr->slug = Str::slug($newCsr->title).'-'.time();
             $newCsr->status = 'draft';
             $newCsr->published_at = null;
             $newCsr->views = 0;
@@ -606,7 +824,7 @@ class CsrController extends Controller
                         $newGallery[] = $newPath;
                     }
                 }
-                if (!empty($newGallery)) {
+                if (! empty($newGallery)) {
                     $newCsr->gallery_images = json_encode($newGallery);
                 }
             }
@@ -616,11 +834,11 @@ class CsrController extends Controller
             return redirect()->route('admin.csr.edit', $newCsr)
                 ->with('success', 'CSR program duplicated successfully.');
         } catch (\Exception $e) {
-            Log::error('CSR Duplicate Error: ' . $e->getMessage());
-            Log::error('Trace: ' . $e->getTraceAsString());
+            Log::error('CSR Duplicate Error: '.$e->getMessage());
+            Log::error('Trace: '.$e->getTraceAsString());
 
             return redirect()->back()
-                ->with('error', 'Failed to duplicate CSR program: ' . $e->getMessage());
+                ->with('error', 'Failed to duplicate CSR program: '.$e->getMessage());
         }
     }
 
@@ -629,7 +847,7 @@ class CsrController extends Controller
      */
     private function duplicateImage($oldPath, $folder)
     {
-        if (!$oldPath || !Storage::disk('public')->exists($oldPath)) {
+        if (! $oldPath || ! Storage::disk('public')->exists($oldPath)) {
             return null;
         }
 
@@ -638,7 +856,7 @@ class CsrController extends Controller
 
         // Generate new filename
         $extension = pathinfo($oldPath, PATHINFO_EXTENSION);
-        $newFilename = $folder . '/' . 'csr-' . time() . '-' . uniqid() . '.' . $extension;
+        $newFilename = $folder.'/'.'csr-'.time().'-'.uniqid().'.'.$extension;
 
         // Copy file
         Storage::disk('public')->copy($oldPath, $newFilename);
@@ -676,11 +894,11 @@ class CsrController extends Controller
             return view('admin.csr.export', compact('data'))
                 ->with('success', 'Data ready for export.');
         } catch (\Exception $e) {
-            Log::error('CSR Export Error: ' . $e->getMessage());
-            Log::error('Trace: ' . $e->getTraceAsString());
+            Log::error('CSR Export Error: '.$e->getMessage());
+            Log::error('Trace: '.$e->getTraceAsString());
 
             return redirect()->back()
-                ->with('error', 'Failed to export data: ' . $e->getMessage());
+                ->with('error', 'Failed to export data: '.$e->getMessage());
         }
     }
 }
