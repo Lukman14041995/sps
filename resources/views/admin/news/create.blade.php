@@ -7,89 +7,118 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
+        /* Improved color scheme */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+        }
+
         .preview-image {
             height: 200px;
-            object-fit: cover
+            object-fit: cover;
+            border-radius: 12px;
         }
 
         .preview-title {
             -webkit-line-clamp: 2;
             display: -webkit-box;
             -webkit-box-orient: vertical;
-            overflow: hidden
+            overflow: hidden;
+            line-height: 1.4;
         }
 
         .preview-excerpt {
             -webkit-line-clamp: 3;
             display: -webkit-box;
             -webkit-box-orient: vertical;
-            overflow: hidden
+            overflow: hidden;
+            line-height: 1.6;
         }
 
+        /* Toast Notifications */
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
             z-index: 9999;
             transform: translateX(400px);
-            transition: .3s
+            transition: .3s ease;
         }
 
         .toast.show {
-            transform: translateX(0)
+            transform: translateX(0);
         }
 
-        /* New Styles */
+        /* Form Styles */
         .form-section {
             transition: all 0.3s ease;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
         }
 
         .form-section:hover {
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
 
         .form-label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #374151;
+            color: var(--gray-700);
             font-size: 0.95rem;
         }
 
         .form-input {
             width: 100%;
             padding: 12px 16px;
-            border: 1.5px solid #D1D5DB;
+            border: 2px solid var(--gray-200);
             border-radius: 12px;
             font-size: 15px;
             transition: all 0.2s ease;
             background-color: white;
+            color: var(--gray-800);
         }
 
         .form-input:focus {
             outline: none;
-            border-color: #3B82F6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            background-color: #F8FAFC;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background-color: white;
         }
 
         .form-input:read-only {
-            background-color: #F9FAFB;
-            color: #6B7280;
+            background-color: var(--gray-50);
+            color: var(--gray-600);
             cursor: not-allowed;
+            border-color: var(--gray-200);
         }
 
         .required-field::after {
             content: " *";
-            color: #EF4444;
+            color: var(--danger-color);
         }
 
+        /* Cards & Badges */
         .preview-card {
             border-radius: 16px;
             overflow: hidden;
             transition: transform 0.3s ease;
+            background: white;
+            border: 1px solid var(--gray-200);
         }
 
         .preview-card:hover {
@@ -103,8 +132,8 @@
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 500;
-            background-color: #F3F4F6;
-            color: #4B5563;
+            background-color: var(--gray-100);
+            color: var(--gray-600);
         }
 
         .status-badge {
@@ -118,61 +147,65 @@
         }
 
         .status-draft {
-            background-color: #FEF3C7;
-            color: #92400E;
+            background-color: #fef3c7;
+            color: #92400e;
         }
 
         .status-published {
-            background-color: #D1FAE5;
-            color: #065F46;
+            background-color: #d1fae5;
+            color: #065f46;
         }
 
         .status-archived {
-            background-color: #F3F4F6;
-            color: #374151;
+            background-color: var(--gray-100);
+            color: var(--gray-700);
         }
 
+        /* Radio Buttons */
         .radio-group {
             display: flex;
-            gap: 20px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .radio-label {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             cursor: pointer;
-            padding: 10px 16px;
+            padding: 12px 20px;
             border-radius: 10px;
-            border: 2px solid #E5E7EB;
+            border: 2px solid var(--gray-200);
             transition: all 0.2s ease;
+            flex: 1;
+            min-width: 120px;
         }
 
         .radio-label:hover {
-            border-color: #3B82F6;
-            background-color: #F8FAFC;
+            border-color: var(--primary-color);
+            background-color: rgba(79, 70, 229, 0.05);
         }
 
         .radio-label input:checked+.radio-custom {
-            background-color: #3B82F6;
-            border-color: #3B82F6;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
         .radio-label input:checked~span {
-            color: #1F2937;
+            color: var(--gray-800);
             font-weight: 600;
         }
 
         .radio-custom {
             width: 20px;
             height: 20px;
-            border: 2px solid #9CA3AF;
+            border: 2px solid var(--gray-300);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            flex-shrink: 0;
         }
 
         .radio-custom::after {
@@ -189,20 +222,27 @@
             transform: scale(1);
         }
 
+        /* File Upload */
         .file-input-container {
             position: relative;
             overflow: hidden;
-            border: 2px dashed #D1D5DB;
+            border: 2px dashed var(--gray-300);
             border-radius: 12px;
-            padding: 24px;
+            padding: 32px 24px;
             text-align: center;
             transition: all 0.3s ease;
-            background-color: #F9FAFB;
+            background-color: var(--gray-50);
+            cursor: pointer;
         }
 
         .file-input-container:hover {
-            border-color: #3B82F6;
-            background-color: #F8FAFC;
+            border-color: var(--primary-color);
+            background-color: rgba(79, 70, 229, 0.05);
+        }
+
+        .file-input-container.drag-over {
+            border-color: var(--primary-color);
+            background-color: rgba(79, 70, 229, 0.1);
         }
 
         .file-input-label {
@@ -214,25 +254,27 @@
         }
 
         .file-input-icon {
-            font-size: 24px;
-            color: #6B7280;
+            font-size: 28px;
+            color: var(--gray-500);
         }
 
         .file-input-text {
-            font-weight: 500;
-            color: #4B5563;
+            font-weight: 600;
+            color: var(--gray-700);
         }
 
         .file-input-hint {
             font-size: 0.875rem;
-            color: #9CA3AF;
+            color: var(--gray-500);
         }
 
+        /* SEO Preview */
         .seo-preview {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 12px;
             padding: 20px;
             color: white;
+            position: relative;
         }
 
         .seo-preview::before {
@@ -246,30 +288,36 @@
             border-radius: 12px 12px 0 0;
         }
 
+        /* Sticky Submit */
         .sticky-submit {
             backdrop-filter: blur(10px);
             background-color: rgba(255, 255, 255, 0.95);
-            border-top: 1px solid #E5E7EB;
+            border-top: 1px solid var(--gray-200);
             margin-left: -16px;
             margin-right: -16px;
             padding-left: 16px;
             padding-right: 16px;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
         }
 
+        /* Tooltips */
         .tooltip {
             position: relative;
+            display: inline-block;
         }
 
         .tooltip-text {
             visibility: hidden;
             width: 200px;
-            background-color: #1F2937;
+            background-color: var(--gray-800);
             color: white;
             text-align: center;
             border-radius: 6px;
             padding: 8px;
             position: absolute;
-            z-index: 1;
+            z-index: 1000;
             bottom: 125%;
             left: 50%;
             transform: translateX(-50%);
@@ -277,6 +325,7 @@
             transition: opacity 0.3s;
             font-size: 0.875rem;
             font-weight: normal;
+            pointer-events: none;
         }
 
         .tooltip:hover .tooltip-text {
@@ -284,34 +333,37 @@
             opacity: 1;
         }
 
+        /* Progress Bars */
         .progress-bar {
             height: 4px;
-            background: linear-gradient(90deg, #3B82F6, #8B5CF6);
+            background: linear-gradient(90deg, var(--primary-color), #8B5CF6);
             border-radius: 2px;
             margin-top: 4px;
             transition: width 0.3s ease;
         }
 
-        /* Image Preview Styles */
+        /* Image Previews */
         .image-preview-container {
             position: relative;
-            margin-top: 12px;
+            margin-top: 16px;
+            transition: all 0.3s ease;
         }
 
         .image-preview {
             width: 100%;
-            height: 120px;
-            border-radius: 8px;
+            height: 200px;
+            border-radius: 12px;
             object-fit: cover;
-            border: 1px solid #E5E7EB;
+            border: 2px solid var(--gray-200);
+            transition: all 0.3s ease;
         }
 
         .remove-image {
             position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 28px;
-            height: 28px;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background-color: rgba(239, 68, 68, 0.9);
             color: white;
@@ -321,62 +373,132 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border: none;
+            z-index: 10;
         }
 
         .remove-image:hover {
-            background-color: #DC2626;
+            background-color: #dc2626;
             transform: scale(1.1);
         }
 
-        /* Date Picker Fix */
-        .flatpickr-input {
-            cursor: pointer;
+        /* Select2 Customization */
+        .select2-container .select2-selection--single {
+            height: 48px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
         }
 
-        .flatpickr-calendar {
-            border-radius: 12px !important;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
-            border: 1px solid #E5E7EB !important;
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 48px;
+            padding-left: 16px;
         }
 
-        /* Thumbnail Preview */
-        .thumbnail-preview-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 10px;
-            margin-top: 12px;
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 48px;
+            right: 10px;
         }
 
-        .thumbnail-item {
+        /* Validation States */
+        .is-invalid {
+            border-color: var(--danger-color) !important;
+        }
+
+        .is-valid {
+            border-color: var(--success-color) !important;
+        }
+
+        .invalid-feedback {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        /* Loading State */
+        .btn-loading {
             position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 2px solid #E5E7EB;
+            pointer-events: none;
+            opacity: 0.8;
         }
 
-        .thumbnail-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .thumbnail-remove {
+        .btn-loading::after {
+            content: '';
             position: absolute;
-            top: 4px;
-            right: 4px;
             width: 20px;
             height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
             border-radius: 50%;
-            background-color: rgba(239, 68, 68, 0.9);
-            color: white;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .radio-label {
+                width: 100%;
+            }
+
+            .sticky-submit {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0;
+                padding: 16px;
+                border-radius: 0;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .form-section {
+                background: #1f2937;
+                border-color: #374151;
+            }
+
+            .form-input {
+                background: #111827;
+                border-color: #374151;
+                color: #f3f4f6;
+            }
+
+            .form-input:focus {
+                background: #111827;
+            }
+        }
+
+        /* Summernote Fix */
+        .note-editor.note-frame {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .note-editor.note-frame .note-toolbar {
+            background-color: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 10px;
+        }
+
+        .note-editor.note-frame .note-editing-area {
+            background: white;
+        }
+
+        .note-editor.note-frame .note-statusbar {
+            background-color: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
         }
     </style>
 @endpush
@@ -384,16 +506,35 @@
 @section('content')
     <div class="max-w-[1920px] mx-auto px-4 py-6">
 
+        @if ($errors->any())
+            <div class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-red-800">Please fix the following errors:</h3>
+                        <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="flex flex-col lg:flex-row gap-8">
 
             {{-- ================= LEFT FORM ================= --}}
             <div class="lg:w-[70%] space-y-8">
 
-                <form action="{{ route('admin.news.store') }}" method="POST" enctype="multipart/form-data" id="articleForm">
+                <form action="{{ route('admin.news.store') }}" method="POST" enctype="multipart/form-data"
+                    id="articleForm">
                     @csrf
 
                     {{-- BASIC INFORMATION --}}
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 form-section">
+                    <div class="form-section">
                         <div class="p-6 border-b border-gray-100">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
@@ -413,7 +554,8 @@
                                 <label class="form-label required-field">Title</label>
                                 <div class="relative">
                                     <input type="text" id="title" name="title" value="{{ old('title') }}"
-                                        class="form-input pl-11" placeholder="Enter article title" required>
+                                        class="form-input pl-11 {{ $errors->has('title') ? 'is-invalid' : '' }}"
+                                        placeholder="Enter article title" required maxlength="120">
                                     <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                         <i class="fas fa-heading"></i>
                                     </div>
@@ -421,28 +563,35 @@
                                         <span class="text-xs text-gray-500" id="titleCounter">0/120</span>
                                     </div>
                                 </div>
+                                @if ($errors->has('title'))
+                                    <div class="invalid-feedback">{{ $errors->first('title') }}</div>
+                                @endif
                                 <div class="progress-bar" id="titleProgress" style="width: 0%"></div>
                             </div>
 
                             {{-- SLUG --}}
                             <div>
-                                <label class="form-label">Slug URL</label>
+                                <label class="form-label required-field">Slug URL</label>
                                 <div class="relative">
-                                    <input type="text" id="slug" name="slug" value="{{ old('slug') }}" readonly
-                                        class="form-input pl-11" placeholder="Auto-generated from title">
+                                    <input type="text" id="slug" name="slug" value="{{ old('slug') }}"
+                                        class="form-input pl-11 {{ $errors->has('slug') ? 'is-invalid' : '' }}"
+                                        placeholder="Auto-generated from title" required maxlength="255">
                                     <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                         <i class="fas fa-link"></i>
                                     </div>
                                     <button type="button" id="editSlug"
-                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 hover:text-blue-800">
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-600 hover:text-blue-800 bg-transparent border-none cursor-pointer">
                                         <i class="fas fa-edit text-sm"></i>
                                     </button>
                                 </div>
+                                @if ($errors->has('slug'))
+                                    <div class="invalid-feedback">{{ $errors->first('slug') }}</div>
+                                @endif
                                 <p class="text-sm text-gray-500 mt-3 flex items-center gap-2">
                                     <i class="fas fa-external-link-alt text-xs"></i>
                                     URL Preview:
                                     <span class="text-blue-600 font-medium">
-                                        /news/<span id="slugPreview">your-title</span>
+                                        {{ url('/news') }}/<span id="slugPreview">your-title</span>
                                     </span>
                                 </p>
                             </div>
@@ -455,7 +604,7 @@
                                 </div>
                                 <div class="relative">
                                     <textarea id="excerpt" name="excerpt" rows="3" class="form-input"
-                                        placeholder="Brief summary of the article (optional)">{{ old('excerpt') }}</textarea>
+                                        placeholder="Brief summary of the article (optional)" maxlength="200">{{ old('excerpt') }}</textarea>
                                     <div class="absolute right-3 top-3 text-gray-400">
                                         <i class="fas fa-align-left"></i>
                                     </div>
@@ -469,7 +618,7 @@
                                     <label class="form-label">Category</label>
                                     <div class="relative">
                                         <select id="category_id" name="category_id"
-                                            class="form-input appearance-none pl-11">
+                                            class="form-input appearance-none pl-11 w-full">
                                             <option value="">-- Select Category --</option>
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}"
@@ -481,7 +630,8 @@
                                         <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                             <i class="fas fa-folder"></i>
                                         </div>
-                                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                        <div
+                                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
                                             <i class="fas fa-chevron-down"></i>
                                         </div>
                                     </div>
@@ -492,8 +642,8 @@
                                     <label class="form-label">Author</label>
                                     <div class="relative">
                                         <input type="text" id="author" name="author"
-                                            {{-- value="{{ old('author', auth()->user()->name) }}" class="form-input pl-11" --}}
-                                            placeholder="Article author">
+                                            value="{{ old('author', auth()->user()->name ?? '') }}"
+                                            class="form-input pl-11" placeholder="Article author" maxlength="100">
                                         <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                                             <i class="fas fa-user-edit"></i>
                                         </div>
@@ -505,7 +655,7 @@
                     </div>
 
                     {{-- CONTENT --}}
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 form-section">
+                    <div class="form-section">
                         <div class="p-6 border-b border-gray-100">
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-lg bg-purple-50 flex items-center justify-center">
@@ -518,19 +668,28 @@
                             </div>
                         </div>
                         <div class="p-6">
-                            <textarea id="content" name="content" class="summernote">{{ old('content') }}</textarea>
+                            {{-- Hidden input yang akan diisi oleh JavaScript --}}
+                            <input type="hidden" id="content_hidden" name="content" value="{{ old('content') }}">
+                            
+                            {{-- Summernote editor --}}
+                            <div id="summernote"></div>
+                            
+                            @if ($errors->has('content'))
+                                <div class="invalid-feedback mt-2">{{ $errors->first('content') }}</div>
+                            @endif
                         </div>
                     </div>
 
                     {{-- IMAGES --}}
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 form-section p-6">
+                    <div class="form-section p-6">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
                                 <i class="fas fa-images text-green-600"></i>
                             </div>
                             <div>
                                 <h2 class="text-xl font-bold text-gray-800">Images</h2>
-                                <p class="text-sm text-gray-600">Upload article images</p>
+                                <p class="text-sm text-gray-600">Upload article images (Max: Featured 2MB, Thumbnail 1MB)
+                                </p>
                             </div>
                         </div>
 
@@ -543,9 +702,9 @@
                                             <i class="fas fa-image"></i>
                                         </div>
                                         <input type="file" id="featured_image" name="featured_image" class="hidden"
-                                            accept="image/*">
-                                        <div class="file-input-text">Click to upload featured image</div>
-                                        <div class="file-input-hint">Recommended: 1200x630px, max 2MB</div>
+                                            accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                                        <div class="file-input-text">Click or drag to upload featured image</div>
+                                        <div class="file-input-hint">Recommended: 1200x630px • Max 2MB</div>
                                     </label>
                                 </div>
                                 <div class="image-preview-container hidden" id="featuredImagePreview">
@@ -555,6 +714,9 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
+                                @if ($errors->has('featured_image'))
+                                    <div class="invalid-feedback">{{ $errors->first('featured_image') }}</div>
+                                @endif
                             </div>
 
                             <div>
@@ -565,9 +727,9 @@
                                             <i class="fas fa-camera"></i>
                                         </div>
                                         <input type="file" id="thumbnail_image" name="thumbnail_image" class="hidden"
-                                            accept="image/*">
-                                        <div class="file-input-text">Click to upload thumbnail</div>
-                                        <div class="file-input-hint">Recommended: 400x300px, max 1MB</div>
+                                            accept="image/jpeg,image/png,image/jpg,image/gif,image/webp">
+                                        <div class="file-input-text">Click or drag to upload thumbnail</div>
+                                        <div class="file-input-hint">Recommended: 400x300px • Max 1MB</div>
                                     </label>
                                 </div>
                                 <div class="image-preview-container hidden" id="thumbnailImagePreview">
@@ -577,12 +739,15 @@
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
+                                @if ($errors->has('thumbnail_image'))
+                                    <div class="invalid-feedback">{{ $errors->first('thumbnail_image') }}</div>
+                                @endif
                             </div>
                         </div>
                     </div>
 
                     {{-- SEO --}}
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 form-section p-6">
+                    <div class="form-section p-6">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center">
                                 <i class="fas fa-search text-yellow-600"></i>
@@ -600,7 +765,10 @@
                                     <span class="text-xs text-gray-500" id="metaTitleCounter">0/60</span>
                                 </div>
                                 <input type="text" id="meta_title" name="meta_title" value="{{ old('meta_title') }}"
-                                    class="form-input" placeholder="SEO title for search engines">
+                                    class="form-input" placeholder="SEO title for search engines" maxlength="60">
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Recommended: 50-60 characters
+                                </p>
                             </div>
 
                             <div>
@@ -609,7 +777,10 @@
                                     <span class="text-xs text-gray-500" id="metaDescCounter">0/160</span>
                                 </div>
                                 <textarea id="meta_description" name="meta_description" rows="3" class="form-input"
-                                    placeholder="Brief description for search results">{{ old('meta_description') }}</textarea>
+                                    placeholder="Brief description for search results" maxlength="160">{{ old('meta_description') }}</textarea>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Recommended: 120-160 characters
+                                </p>
                             </div>
 
                             <div>
@@ -618,14 +789,14 @@
                                     value="{{ old('meta_keywords') }}" class="form-input"
                                     placeholder="keyword1, keyword2, keyword3">
                                 <p class="text-xs text-gray-500 mt-2">
-                                    Separate keywords with commas
+                                    Separate keywords with commas (Max 255 characters)
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     {{-- PUBLISH --}}
-                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 form-section p-6">
+                    <div class="form-section p-6">
                         <div class="flex items-center gap-3 mb-6">
                             <div class="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
                                 <i class="fas fa-paper-plane text-red-600"></i>
@@ -638,10 +809,11 @@
 
                         <div class="space-y-8">
                             <div>
-                                <label class="form-label mb-4 block">Status</label>
+                                <label class="form-label mb-4 block required-field">Status</label>
                                 <div class="radio-group">
                                     <label class="radio-label">
-                                        <input type="radio" name="status" value="draft" checked class="hidden">
+                                        <input type="radio" name="status" value="draft"
+                                            {{ old('status', 'draft') == 'draft' ? 'checked' : '' }} class="hidden">
                                         <span class="radio-custom"></span>
                                         <span class="flex items-center gap-2">
                                             <i class="fas fa-edit text-gray-500"></i>
@@ -650,7 +822,8 @@
                                     </label>
 
                                     <label class="radio-label">
-                                        <input type="radio" name="status" value="published" class="hidden">
+                                        <input type="radio" name="status" value="published"
+                                            {{ old('status') == 'published' ? 'checked' : '' }} class="hidden">
                                         <span class="radio-custom"></span>
                                         <span class="flex items-center gap-2">
                                             <i class="fas fa-check-circle text-gray-500"></i>
@@ -659,7 +832,8 @@
                                     </label>
 
                                     <label class="radio-label">
-                                        <input type="radio" name="status" value="archived" class="hidden">
+                                        <input type="radio" name="status" value="archived"
+                                            {{ old('status') == 'archived' ? 'checked' : '' }} class="hidden">
                                         <span class="radio-custom"></span>
                                         <span class="flex items-center gap-3">
                                             <i class="fas fa-archive text-gray-500"></i>
@@ -667,6 +841,9 @@
                                         </span>
                                     </label>
                                 </div>
+                                @if ($errors->has('status'))
+                                    <div class="invalid-feedback">{{ $errors->first('status') }}</div>
+                                @endif
                             </div>
 
                             <div>
@@ -679,34 +856,43 @@
                                         <i class="fas fa-calendar-alt"></i>
                                     </div>
                                     <button type="button" id="clearDate"
-                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
                                 <p class="text-xs text-gray-500 mt-2">
-                                    Leave empty to use current date and time
+                                    Leave empty to use current date and time when publishing
                                 </p>
                             </div>
                         </div>
                     </div>
 
                     {{-- SUBMIT --}}
-                    <div
-                        class="sticky-submit sticky bottom-0 p-6 rounded-xl shadow-lg flex justify-between items-center mt-8">
+                    <div class="sticky-submit py-6 flex justify-between items-center mt-8">
                         <div class="flex items-center gap-4">
                             <div id="formStatus" class="status-badge status-draft">
                                 <i class="fas fa-edit"></i>
-                                Draft
+                                <span id="statusText">Draft</span>
                             </div>
                             <div class="text-sm text-gray-600">
                                 <span id="formProgress">0%</span> complete
                             </div>
                         </div>
-                        <button type="submit"
-                            class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-10 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-                            <i class="fas fa-plus-circle"></i>
-                            Create Article
-                        </button>
+                        <div class="flex gap-3">
+                            <a href="{{ route('admin.news.index') }}"
+                                class="px-6 py-3 rounded-xl font-semibold shadow transition-all duration-300 flex items-center gap-3
+                                       bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </a>
+                            <button type="submit" id="submitBtn"
+                                class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 
+                                       text-white px-10 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl 
+                                       transition-all duration-300 flex items-center gap-3">
+                                <i class="fas fa-plus-circle"></i>
+                                Create Article
+                            </button>
+                        </div>
                     </div>
 
                 </form>
@@ -717,22 +903,22 @@
                 <div class="sticky top-8 space-y-8">
 
                     {{-- PREVIEW CARD --}}
-                    <div class="preview-card bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                    <div class="preview-card">
                         <div class="seo-preview relative">
                             <div class="flex items-center gap-2 mb-2">
                                 <div class="w-3 h-3 rounded-full bg-red-400"></div>
                                 <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
                                 <div class="w-3 h-3 rounded-full bg-green-400"></div>
                             </div>
-                            <div class="text-xs opacity-75 mb-1">example.com</div>
+                            <div class="text-xs opacity-75 mb-1">{{ config('app.url', 'example.com') }}</div>
                             <p id="previewMetaTitle" class="text-lg font-semibold truncate">
-                                Your SEO Title Here
+                                {{ old('meta_title') ?: 'Your SEO Title Here' }}
                             </p>
                             <p id="previewMetaUrl" class="text-sm opacity-90 truncate">
-                                /news/your-article-title
+                                {{ url('/news') }}/{{ old('slug') ?: 'your-article-title' }}
                             </p>
-                            <p id="previewMetaDesc" class="text-sm mt-2 opacity-90 truncate">
-                                This is where your meta description will appear in search results.
+                            <p id="previewMetaDesc" class="text-sm mt-2 opacity-90 line-clamp-2">
+                                {{ old('meta_description') ?: 'This is where your meta description will appear in search results.' }}
                             </p>
                         </div>
 
@@ -740,11 +926,13 @@
                             <div class="flex justify-between items-start">
                                 <div class="preview-badge" id="previewCategory">
                                     <i class="fas fa-tag mr-2"></i>
-                                    Uncategorized
+                                    {{ $categories->firstWhere('id', old('category_id'))?->name ?: 'Uncategorized' }}
                                 </div>
-                                <div class="status-badge status-draft" id="previewStatus">
-                                    <i class="fas fa-edit"></i>
-                                    Draft
+                                <div class="status-badge {{ old('status', 'draft') == 'published' ? 'status-published' : (old('status') == 'archived' ? 'status-archived' : 'status-draft') }}"
+                                    id="previewStatus">
+                                    <i
+                                        class="fas {{ old('status', 'draft') == 'published' ? 'fa-check-circle' : (old('status') == 'archived' ? 'fa-archive' : 'fa-edit') }}"></i>
+                                    {{ ucfirst(old('status', 'draft')) }}
                                 </div>
                             </div>
 
@@ -759,7 +947,7 @@
                             <div class="mt-4">
                                 <label class="text-sm font-medium text-gray-700 mb-2 block">Thumbnail Preview:</label>
                                 <div id="previewThumbnailContainer" class="flex flex-wrap gap-2">
-                                    <div id="previewThumbnailImage" class="thumbnail-item">
+                                    <div class="thumbnail-item">
                                         <img id="previewThumbnailImg"
                                             src="https://via.placeholder.com/80x80/cccccc/969696?text=Thumbnail"
                                             alt="Thumbnail Preview">
@@ -768,11 +956,11 @@
                             </div>
 
                             <h3 id="previewTitle" class="text-xl font-bold text-gray-800 preview-title mt-4">
-                                Your article title will appear here
+                                {{ old('title') ?: 'Your article title will appear here' }}
                             </h3>
 
                             <p id="previewExcerpt" class="text-gray-600 preview-excerpt">
-                                This is where your article excerpt will show. Write a compelling summary to engage readers.
+                                {{ old('excerpt') ?: 'This is where your article excerpt will show. Write a compelling summary to engage readers.' }}
                             </p>
 
                             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -783,10 +971,14 @@
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-gray-700" id="previewAuthor">
-                                            {{-- {{ auth()->user()->name }} --}}
+                                            {{ old('author', auth()->user()->name ?? 'Admin') }}
                                         </p>
                                         <p class="text-xs text-gray-500" id="previewDate">
-                                            {{ now()->format('M d, Y') }}
+                                            @if (old('published_at'))
+                                                {{ \Carbon\Carbon::parse(old('published_at'))->format('M d, Y H:i') }}
+                                            @else
+                                                {{ now()->format('M d, Y') }}
+                                            @endif
                                         </p>
                                     </div>
                                 </div>
@@ -826,7 +1018,7 @@
                         <ul class="space-y-3 text-sm text-gray-600">
                             <li class="flex items-start gap-2">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                <span>Use descriptive titles for better SEO</span>
+                                <span>Use descriptive titles (50-60 characters for SEO)</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
@@ -834,11 +1026,11 @@
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                <span>Include relevant images for engagement</span>
+                                <span>Use high-quality images for better engagement</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
-                                <span>Optimize meta tags for search engines</span>
+                                <span>Optimize meta tags (120-160 characters for description)</span>
                             </li>
                         </ul>
                     </div>
@@ -854,39 +1046,101 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            // Initialize editors
-            $('.summernote').summernote({
+            // Fungsi untuk update hidden input dari Summernote
+            function updateContentInput() {
+                const content = $('#summernote').summernote('code');
+                $('#content_hidden').val(content);
+                
+                // Update preview content length
+                updateContentLength(content);
+                updateSEOscore();
+            }
+
+            // Global function for image upload (for Summernote)
+            function uploadImage(file) {
+                const data = new FormData();
+                data.append('image', file);
+
+                $.ajax({
+                    url: '{{ route('upload.summernote.store') }}',
+                    method: 'POST',
+                    data: data,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        // Show loading
+                        $('#summernote').summernote('disable');
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#summernote').summernote('insertImage', response.url);
+                        } else {
+                            alert('Upload failed: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Failed to upload image';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            errorMessage = xhr.responseJSON.errors.image[0];
+                        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        alert(errorMessage);
+                    },
+                    complete: function() {
+                        $('#summernote').summernote('enable');
+                    }
+                });
+            }
+
+            // Initialize Summernote
+            $('#summernote').summernote({
                 height: 350,
                 toolbar: [
                     ['style', ['bold', 'italic', 'underline', 'clear']],
                     ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
                     ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link', 'picture', 'video']],
+                    ['insert', ['link', 'picture', 'video', 'table']],
                     ['view', ['fullscreen', 'codeview', 'help']]
                 ],
                 callbacks: {
-                    onChange: function(contents) {
-                        updateContentLength(contents);
-                        updateSEOscore();
+                    onChange: function() {
+                        updateContentInput();
+                    },
+                    onImageUpload: function(files) {
+                        uploadImage(files[0]);
+                    },
+                    onInit: function() {
+                        // Set initial content jika ada old value
+                        const oldContent = '{{ old('content', '') }}';
+                        if (oldContent) {
+                            $('#summernote').summernote('code', oldContent);
+                        }
                     }
                 }
             });
 
-            // Initialize datepicker dengan konfigurasi yang benar
+            // Initialize Flatpickr
             const datepicker = flatpickr('#published_at', {
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
                 time_24hr: true,
-                defaultDate: "{{ now()->format('Y-m-d H:i') }}",
+                defaultDate: "{{ old('published_at', now()->format('Y-m-d H:i')) }}",
                 minDate: "{{ now()->subYears(1)->format('Y-m-d') }}",
                 maxDate: "{{ now()->addYears(5)->format('Y-m-d') }}",
                 allowInput: true,
                 clickOpens: true,
-                onOpen: function(selectedDates, dateStr, instance) {
-                    instance.set('enableTime', true);
+                onChange: function(selectedDates, dateStr) {
+                    updatePreviewDate(dateStr);
                 }
             });
 
@@ -897,32 +1151,35 @@
                 $('#previewDate').text('{{ now()->format('M d, Y') }}');
             });
 
-            // Update preview date ketika datepicker berubah
-            $('#published_at').on('change', function() {
-                const date = $(this).val();
-                if (date) {
-                    const formattedDate = new Date(date + ' UTC').toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
-                    $('#previewDate').text(formattedDate);
-                } else {
-                    $('#previewDate').text('{{ now()->format('M d, Y') }}');
-                }
-            });
+            // Fungsi generate slug
+            function generateSlug(title) {
+                if (!title) return '';
 
-            // SLUG generation
-            function slugify(text) {
-                return text.toLowerCase().trim()
-                    .replace(/[^a-z0-9\s-]/g, '')
-                    .replace(/\s+/g, '-')
-                    .replace(/-+/g, '-');
+                return title
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/[\s_-]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
             }
 
-            // Enable slug editing
+            // Auto-generate slug from title
+            $('#title').on('input', function() {
+                const title = $(this).val();
+                const slug = generateSlug(title);
+
+                if (!isSlugEditable) {
+                    $('#slug').val(slug);
+                    $('#slugPreview').text(slug || 'your-title');
+                    $('#previewMetaUrl').text('{{ config('app.url', 'example.com') }}/news/' + (slug ||
+                        'your-title'));
+                }
+
+                $('#previewTitle').text(title || 'Your article title will appear here');
+                updateSEOscore();
+            });
+
+            // Enable/disable slug editing
             let isSlugEditable = false;
             $('#editSlug').click(function() {
                 isSlugEditable = !isSlugEditable;
@@ -930,18 +1187,25 @@
                 if (isSlugEditable) {
                     slugInput.prop('readonly', false);
                     slugInput.removeClass('bg-gray-100');
-                    slugInput.addClass('bg-white');
+                    slugInput.addClass('bg-white border-blue-300');
                     $(this).html('<i class="fas fa-lock text-green-600"></i>');
                 } else {
                     slugInput.prop('readonly', true);
-                    slugInput.removeClass('bg-white');
+                    slugInput.removeClass('bg-white border-blue-300');
                     slugInput.addClass('bg-gray-100');
                     $(this).html('<i class="fas fa-edit text-blue-600"></i>');
                 }
             });
 
+            // Update slug preview when manually edited
+            $('#slug').on('input', function() {
+                const slug = $(this).val();
+                $('#slugPreview').text(slug || 'your-title');
+                $('#previewMetaUrl').text('{{ url('/news') }}/' + (slug || 'your-title'));
+            });
+
             // Character counters
-            function updateCounter(elementId, maxLength) {
+            function setupCounter(elementId, maxLength, previewElementId = null) {
                 const element = $(elementId);
                 const counter = $(elementId + 'Counter');
                 const progress = $(elementId + 'Progress');
@@ -951,16 +1215,23 @@
                     counter.text(`${length}/${maxLength}`);
 
                     // Update progress bar
-                    const percentage = (length / maxLength) * 100;
-                    progress.css('width', Math.min(percentage, 100) + '%');
+                    if (progress.length) {
+                        const percentage = (length / maxLength) * 100;
+                        progress.css('width', Math.min(percentage, 100) + '%');
 
-                    // Update color based on length
-                    if (length > maxLength * 0.9) {
-                        progress.css('background', '#EF4444');
-                    } else if (length > maxLength * 0.7) {
-                        progress.css('background', '#F59E0B');
-                    } else {
-                        progress.css('background', 'linear-gradient(90deg, #3B82F6, #8B5CF6)');
+                        // Update color based on length
+                        if (length > maxLength * 0.9) {
+                            progress.css('background', '#EF4444');
+                        } else if (length > maxLength * 0.7) {
+                            progress.css('background', '#F59E0B');
+                        } else {
+                            progress.css('background', 'linear-gradient(90deg, #4f46e5, #8B5CF6)');
+                        }
+                    }
+
+                    // Update preview
+                    if (previewElementId) {
+                        $(previewElementId).text($(this).val() || $(previewElementId).data('default'));
                     }
 
                     updateSEOscore();
@@ -971,30 +1242,20 @@
             }
 
             // Initialize counters
-            updateCounter('#title', 120);
-            updateCounter('#excerpt', 200);
-            updateCounter('#meta_title', 60);
-            updateCounter('#meta_description', 160);
+            setupCounter('#title', 120, '#previewTitle');
+            setupCounter('#excerpt', 200, '#previewExcerpt');
+            setupCounter('#meta_title', 60, '#previewMetaTitle');
+            setupCounter('#meta_description', 160, '#previewMetaDesc');
 
-            // Update preview functions
-            $('#title').on('input', function() {
-                const slug = slugify($(this).val());
-                if (!isSlugEditable) {
-                    $('#slug').val(slug);
-                }
-                $('#slugPreview').text(slug || 'your-title');
-                $('#previewTitle').text($(this).val() || 'Your article title will appear here');
-                $('#previewMetaUrl').text('example.com/news/' + (slug || 'your-title'));
-                updateSEOscore();
-            });
-
+            // Update other previews
             $('#excerpt').on('input', function() {
                 $('#previewExcerpt').text($(this).val() ||
                     'This is where your article excerpt will show. Write a compelling summary to engage readers.'
-                    );
+                );
             });
 
             $('#author').on('input', function() {
+                $('#previewAuthor').text($(this).val() || '{{ auth()->user()->name ?? 'Admin' }}');
             });
 
             $('#meta_title').on('input', function() {
@@ -1008,8 +1269,8 @@
 
             $('#category_id').on('change', function() {
                 const selectedText = $('#category_id option:selected').text();
-                $('#previewCategory').html('<i class="fas fa-tag mr-2"></i>' + (selectedText ||
-                    'Uncategorized'));
+                $('#previewCategory').html('<i class="fas fa-tag mr-2"></i>' +
+                    (selectedText !== '-- Select Category --' ? selectedText : 'Uncategorized'));
             });
 
             // Status radio buttons
@@ -1017,6 +1278,7 @@
                 const status = $(this).val();
                 const statusBadge = $('#previewStatus');
                 const formStatus = $('#formStatus');
+                const statusText = $('#statusText');
 
                 statusBadge.removeClass().addClass('status-badge');
                 formStatus.removeClass().addClass('status-badge');
@@ -1026,92 +1288,158 @@
                         '<i class="fas fa-check-circle"></i> Published');
                     formStatus.addClass('status-published').html(
                         '<i class="fas fa-check-circle"></i> Published');
+                    statusText.text('Published');
                 } else if (status === 'archived') {
                     statusBadge.addClass('status-archived').html('<i class="fas fa-archive"></i> Archived');
                     formStatus.addClass('status-archived').html('<i class="fas fa-archive"></i> Archived');
+                    statusText.text('Archived');
                 } else {
                     statusBadge.addClass('status-draft').html('<i class="fas fa-edit"></i> Draft');
                     formStatus.addClass('status-draft').html('<i class="fas fa-edit"></i> Draft');
+                    statusText.text('Draft');
                 }
             });
 
-            // Featured Image upload preview
-            $('#featured_image').on('change', function() {
-                if (this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Update preview in form
-                        $('#featuredImagePreview').removeClass('hidden');
-                        $('#featuredPreviewImg').attr('src', e.target.result);
-                        $('#featuredImageContainer').addClass('hidden');
+            // File upload with drag and drop
+            function setupFileUpload(inputId, containerId, previewId, imageId, statusId) {
+                const input = $(inputId);
+                const container = $(containerId);
+                const preview = $(previewId);
+                const image = $(imageId);
+                const status = $(statusId);
 
-                        // Update preview in preview card
-                        $('#previewFeaturedImage').attr('src', e.target.result);
-                        $('#featuredImageStatus').removeClass('text-red-600').addClass('text-green-600')
-                            .text('Yes');
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
+                // Click to upload
+                container.on('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        input.click();
+                    }
+                });
 
-            // Remove featured image
+                // File selection
+                input.on('change', function() {
+                    if (this.files && this.files[0]) {
+                        const file = this.files[0];
+
+                        // Check file size
+                        const maxSize = inputId === '#featured_image' ? 2 * 1024 * 1024 : 1 * 1024 * 1024;
+                        if (file.size > maxSize) {
+                            alert(`File size exceeds maximum limit (${maxSize/1024/1024}MB)`);
+                            this.value = '';
+                            return;
+                        }
+
+                        // Check file type
+                        const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif',
+                            'image/webp'
+                        ];
+                        if (!validTypes.includes(file.type)) {
+                            alert('Please upload a valid image file (JPEG, PNG, JPG, GIF, WEBP)');
+                            this.value = '';
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            preview.removeClass('hidden');
+                            image.attr('src', e.target.result);
+                            container.addClass('hidden');
+                            status.removeClass('text-red-600').addClass('text-green-600').text('Yes');
+
+                            // Update preview in preview card
+                            if (inputId === '#featured_image') {
+                                $('#previewFeaturedImage').attr('src', e.target.result);
+                            } else {
+                                $('#previewThumbnailImg').attr('src', e.target.result);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                // Drag and drop
+                container.on('dragover', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    container.addClass('drag-over');
+                });
+
+                container.on('dragleave', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    container.removeClass('drag-over');
+                });
+
+                container.on('drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    container.removeClass('drag-over');
+
+                    const files = e.originalEvent.dataTransfer.files;
+                    if (files.length > 0) {
+                        input[0].files = files;
+                        input.trigger('change');
+                    }
+                });
+            }
+
+            // Setup file uploads
+            setupFileUpload('#featured_image', '#featuredImageContainer', '#featuredImagePreview',
+                '#featuredPreviewImg', '#featuredImageStatus');
+            setupFileUpload('#thumbnail_image', '#thumbnailImageContainer', '#thumbnailImagePreview',
+                '#thumbnailPreviewImg', '#thumbnailImageStatus');
+
+            // Remove images
             $('#removeFeaturedImage').click(function() {
                 $('#featured_image').val('');
                 $('#featuredImagePreview').addClass('hidden');
                 $('#featuredImageContainer').removeClass('hidden');
                 $('#featuredImageStatus').removeClass('text-green-600').addClass('text-red-600').text('No');
-
-                // Reset preview image
                 $('#previewFeaturedImage').attr('src',
                     'https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=200&q=80'
-                    );
+                );
             });
 
-            // Thumbnail Image upload preview
-            $('#thumbnail_image').on('change', function() {
-                if (this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        // Update preview in form
-                        $('#thumbnailImagePreview').removeClass('hidden');
-                        $('#thumbnailPreviewImg').attr('src', e.target.result);
-                        $('#thumbnailImageContainer').addClass('hidden');
-
-                        // Update preview in preview card
-                        $('#previewThumbnailImg').attr('src', e.target.result);
-                        $('#thumbnailImageStatus').removeClass('text-red-600').addClass(
-                            'text-green-600').text('Yes');
-                    };
-                    reader.readAsDataURL(this.files[0]);
-                }
-            });
-
-            // Remove thumbnail image
             $('#removeThumbnailImage').click(function() {
                 $('#thumbnail_image').val('');
                 $('#thumbnailImagePreview').addClass('hidden');
                 $('#thumbnailImageContainer').removeClass('hidden');
                 $('#thumbnailImageStatus').removeClass('text-green-600').addClass('text-red-600').text(
-                'No');
-
-                // Reset preview image
+                    'No');
                 $('#previewThumbnailImg').attr('src',
                     'https://via.placeholder.com/80x80/cccccc/969696?text=Thumbnail');
             });
 
             // Calculate content length
             function updateContentLength(content) {
+                // Remove HTML tags untuk menghitung kata
                 const text = $(content).text();
-                const wordCount = text.trim().split(/\s+/).length;
+                const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
                 const charCount = text.length;
 
                 $('#contentLength').text(wordCount + ' words');
 
                 // Calculate read time (average 200 words per minute)
-                const readTime = Math.ceil(wordCount / 200);
+                const readTime = Math.max(1, Math.ceil(wordCount / 200));
                 $('#previewReadTime').text(readTime + ' min read');
 
                 updateSEOscore();
+            }
+
+            // Update preview date
+            function updatePreviewDate(dateStr) {
+                if (dateStr) {
+                    const date = new Date(dateStr);
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    $('#previewDate').text(formattedDate);
+                } else {
+                    $('#previewDate').text('{{ now()->format('M d, Y') }}');
+                }
             }
 
             // Calculate SEO score
@@ -1141,30 +1469,93 @@
                 if ($('#author').val()) score += 5;
 
                 // Content score (30 points based on length)
-                const contentText = $('.summernote').summernote('code');
-                const wordCount = $(contentText).text().trim().split(/\s+/).length;
+                const contentText = $('#summernote').summernote('code');
+                const wordCount = $(contentText).text().trim().split(/\s+/).filter(word => word.length > 0).length;
                 if (wordCount >= 300) score += 30;
                 else if (wordCount >= 200) score += 20;
                 else if (wordCount >= 100) score += 10;
 
                 // Update score display
-                $('#seoScore').text(score + '%');
-                if (score >= 80) {
+                const finalScore = Math.min(score, maxScore);
+                $('#seoScore').text(finalScore + '%');
+
+                if (finalScore >= 80) {
                     $('#seoScore').removeClass('text-red-600 text-yellow-600').addClass('text-green-600');
-                } else if (score >= 60) {
+                } else if (finalScore >= 60) {
                     $('#seoScore').removeClass('text-red-600 text-green-600').addClass('text-yellow-600');
                 } else {
                     $('#seoScore').removeClass('text-green-600 text-yellow-600').addClass('text-red-600');
                 }
 
                 // Update form progress
-                const formProgress = Math.min(score, 100);
-                $('#formProgress').text(formProgress + '%');
+                $('#formProgress').text(finalScore + '%');
             }
 
+            // Form submission - Pastikan content diupdate sebelum submit
+            $('#articleForm').on('submit', function(e) {
+                // Update content dari Summernote ke hidden input
+                updateContentInput();
+                
+                // Validasi content
+                const content = $('#content_hidden').val();
+                if (!content || content.trim() === '' || content === '<p><br></p>') {
+                    e.preventDefault();
+                    alert('Please enter some content for the article.');
+                    $('#submitBtn').prop('disabled', false);
+                    return false;
+                }
+
+                // Validasi required fields
+                const title = $('#title').val();
+                const slug = $('#slug').val();
+                
+                if (!title || !slug) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields.');
+                    $('#submitBtn').prop('disabled', false);
+                    return false;
+                }
+
+                const submitBtn = $('#submitBtn');
+                submitBtn.prop('disabled', true);
+                submitBtn.addClass('btn-loading');
+                submitBtn.html('<i class="fas fa-spinner fa-spin"></i> Creating...');
+                
+                // Biarkan form submit normal
+                return true;
+            });
+
+            // Handle Enter key in form (prevent accidental submission)
+            $('#articleForm').on('keydown', function(e) {
+                if (e.key === 'Enter' && $(e.target).is(
+                        'input:not([type="submit"]):not([type="button"])')) {
+                    e.preventDefault();
+                }
+            });
+
+            // Initialize with old values if exists
+            @if (old('featured_image'))
+                // Handle featured image preview if there was an error
+                $('#featuredImagePreview').removeClass('hidden');
+                $('#featuredImageContainer').addClass('hidden');
+                $('#featuredImageStatus').removeClass('text-red-600').addClass('text-green-600').text('Yes');
+            @endif
+
+            @if (old('thumbnail_image'))
+                // Handle thumbnail image preview if there was an error
+                $('#thumbnailImagePreview').removeClass('hidden');
+                $('#thumbnailImageContainer').addClass('hidden');
+                $('#thumbnailImageStatus').removeClass('text-red-600').addClass('text-green-600').text('Yes');
+            @endif
+
             // Initial updates
-            updateContentLength($('.summernote').summernote('code'));
+            updateContentInput();
             updateSEOscore();
+
+            // Trigger initial updates for preview
+            $('#title').trigger('input');
+            $('#slug').trigger('input');
+            $('input[name="status"]:checked').trigger('change');
         });
     </script>
 @endpush

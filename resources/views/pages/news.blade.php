@@ -175,9 +175,11 @@
                         <div class="lg:flex">
                             <!-- Image Column -->
                             <div class="lg:w-1/2 relative">
-                                <img src="{{ $featuredNews->getThumbnailUrl() }}"
+                                <img src="{{ Storage::disk('s3')->url($featuredNews->thumbnail_image) }}"
                                     class="w-full h-64 sm:h-72 lg:h-full object-cover" alt="{{ $featuredNews->title }}"
                                     loading="lazy">
+                                <a href="{{ route('frontend.news.show', $featuredNews->slug) }}"
+                                    class="hover:text-blue-600 transition-colors">
                             </div>
 
                             <!-- Content Column -->
@@ -191,8 +193,7 @@
                                     @endif
                                 </div>
                                 <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                                    <a href=""
-                                        class="hover:text-blue-600 transition-colors">
+                                    <a href="" class="hover:text-blue-600 transition-colors">
                                         {{ $featuredNews->title }}
                                     </a>
                                 </h2>
@@ -204,7 +205,7 @@
                                         <i class="far fa-calendar mr-1"></i>
                                         {{ $featuredNews->published_at->format('d M Y') }}
                                     </div>
-                                    <a href=""
+                                    <a href="{{ route('frontend.news.show', $featuredNews->slug) }}"
                                         class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-800">
                                         Baca Selengkapnya
                                         <i class="fas fa-arrow-right ml-2"></i>
@@ -293,9 +294,13 @@
                                 class="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
                                 <!-- Image Container -->
                                 <div class="relative overflow-hidden">
-                                    <img src="{{ $news->getThumbnailUrl() ? asset('storage/' . $news->getThumbnailUrl()) : 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}"
+                                    <img src="{{ $news->thumbnail_image
+                                        ? Storage::disk('s3')->url($news->thumbnail_image)
+                                        : 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}"
                                         class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
-                                        alt="{{ $news->title }}" loading="lazy">
+                                        alt="{{ $news->title }}" loading="lazy"
+                                        onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';">
+
                                     <!-- Date Badge -->
                                     <div class="absolute top-4 left-4">
                                         <div class="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-sm">
@@ -395,14 +400,10 @@
                                     <!-- Meta Bottom -->
                                     <div class="flex items-center justify-between pt-4 border-t border-gray-100">
                                         <!-- Read More -->
-                                        <a href=""
-                                            class="inline-flex items-center text-blue-600 font-medium text-sm group/link hover:text-blue-800">
-                                            <span>Baca Selengkapnya</span>
-                                            <svg class="w-4 h-4 ml-2 transform group-hover/link:translate-x-1 transition-transform"
-                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                            </svg>
+                                        <a href="{{ route('frontend.news.show', $news->slug) }}"
+                                            class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-800">
+                                            Baca Selengkapnya
+                                            <i class="fas fa-arrow-right ml-2"></i>
                                         </a>
 
                                         <!-- Stats -->
@@ -485,8 +486,13 @@
                                 class="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
                                 <!-- Image -->
                                 <div class="relative">
-                                    <img src="{{ $news->getThumbnailUrl() ? asset('storage/' . $news->getThumbnailUrl()) : 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80' }}"
-                                        class="w-full h-48 object-cover" alt="{{ $news->title }}" loading="lazy">
+                                    <img src="{{ $news->thumbnail_image
+                                        ? Storage::disk('s3')->url($news->thumbnail_image)
+                                        : 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}"
+                                        class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
+                                        alt="{{ $news->title }}" loading="lazy"
+                                        onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80';">
+
                                     <!-- Category Badge -->
                                     @if ($news->category)
                                         <div class="absolute top-3 right-3">
@@ -536,14 +542,10 @@
                                     </p>
 
                                     <!-- Read More -->
-                                    <a href=""
-                                        class="inline-flex items-center text-blue-600 font-medium text-sm hover:text-blue-800">
-                                        <span>Baca Selengkapnya</span>
-                                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                        </svg>
+                                    <a href="{{ route('frontend.news.show', $news->slug) }}"
+                                        class="inline-flex items-center text-blue-600 font-semibold hover:text-blue-800">
+                                        Baca Selengkapnya
+                                        <i class="fas fa-arrow-right ml-2"></i>
                                     </a>
                                 </div>
                             </article>
