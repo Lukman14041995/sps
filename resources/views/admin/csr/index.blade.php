@@ -365,40 +365,31 @@
             <h2 class="text-xl font-bold text-gray-900 mb-6">Programs by Category</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach ($categories as $key => $category)
+                    @php
+                        // Tentukan warna berdasarkan kategori
+                        $colorMap = [
+                            'social' => '#3B82F6',
+                            'environment' => '#10B981',
+                            'quality' => '#F59E0B',
+                        ];
+                        $color = $category['color'] ?? ($colorMap[$key] ?? '#6B7280');
+                        $lightColor = str_replace('#', '', $color) . '08';
+                    @endphp
                     <div class="flex items-center justify-between p-4 rounded-xl transition duration-200 hover:shadow-md"
-                        style="background-color: {{ $category['color'] }}08; border-left: 4px solid {{ $category['color'] }}">
+                        style="background-color: #{{ $lightColor }}; border-left: 4px solid {{ $color }}">
                         <div class="flex items-center">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center mr-3"
-                                style="background-color: {{ $category['color'] }}20">
-                                @if ($key == 'social')
-                                    <svg class="w-5 h-5" style="color: {{ $category['color'] }}" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                @elseif($key == 'environment')
-                                    <svg class="w-5 h-5" style="color: {{ $category['color'] }}" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4 4 0 003 15z" />
-                                    </svg>
-                                @elseif($key == 'quality')
-                                    <svg class="w-5 h-5" style="color: {{ $category['color'] }}" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                    </svg>
-                                @endif
+                                style="background-color: {{ $color }}20;">
+                                <span class="text-lg">{{ $category['icon'] ?? '📊' }}</span>
                             </div>
                             <div>
-                                <p class="font-medium text-gray-900">{{ $category['name'] }}</p>
-                                <p class="text-xs text-gray-600">{{ $category['description'] }}</p>
+                                <h3 class="font-medium text-gray-900">{{ $category['name'] ?? ucfirst($key) }}</h3>
+                                <p class="text-sm text-gray-600">{{ $stats['by_category'][$key] ?? 0 }} Programs</p>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <p class="text-2xl font-bold text-gray-900">{{ $stats['by_category'][$key] ?? 0 }}</p>
-                            <p class="text-xs text-gray-500">programs</p>
-                        </div>
+                        <span class="text-2xl font-bold" style="color: {{ $color }}">
+                            {{ $stats['by_category'][$key] ?? 0 }}
+                        </span>
                     </div>
                 @endforeach
             </div>
@@ -478,8 +469,9 @@
                             data-year="{{ $csr->year }}" data-created="{{ $csr->created_at }}">
                             <!-- Image -->
                             <div class="relative overflow-hidden">
-                                <img src="{{ $csr->featured_image_url }}" alt="{{ $csr->title }}"
-                                    class="w-full h-48 csr-image">
+                                <img src="{{ Storage::disk('s3')->url($csr->featured_image) }}"
+                                    alt="{{ $csr->title }}" class="w-full h-48 csr-image" />
+
                                 <!-- Status Badge -->
                                 <div class="absolute top-4 left-4">
                                     @php
@@ -566,6 +558,7 @@
                                         Duration: {{ $csr->duration }}
                                     </div>
                                 @endif
+
                             </div>
 
                             <!-- Actions -->
@@ -1182,7 +1175,7 @@
                     const title = card.getAttribute('data-title');
                     const description = card.querySelector('p').textContent.toLowerCase();
                     const location = card.querySelector('span:last-child')?.textContent?.toLowerCase() ||
-                    '';
+                        '';
 
                     if (title.includes(searchTerm) || description.includes(searchTerm) || location.includes(
                             searchTerm)) {
@@ -1216,10 +1209,10 @@
                         return b.getAttribute('data-title').localeCompare(a.getAttribute('data-title'));
                     case 'budget_desc':
                         return parseFloat(b.getAttribute('data-budget')) - parseFloat(a.getAttribute(
-                        'data-budget'));
+                            'data-budget'));
                     case 'budget_asc':
                         return parseFloat(a.getAttribute('data-budget')) - parseFloat(b.getAttribute(
-                        'data-budget'));
+                            'data-budget'));
                     case 'beneficiaries_desc':
                         return parseFloat(b.getAttribute('data-beneficiaries')) - parseFloat(a.getAttribute(
                             'data-beneficiaries'));

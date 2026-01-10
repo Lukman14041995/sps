@@ -175,6 +175,7 @@
 </section>
 
 <!-- Current Openings -->
+<!-- Current Openings -->
 <section id="vacancies" class="py-12 sm:py-16 md:py-20 lg:py-24 bg-gray-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto">
@@ -189,154 +190,153 @@
                 </p>
             </div>
 
-            <!-- Job Categories -->
+            <!-- Job Categories Filter -->
+            @if($departments->count() > 0)
             <div class="flex flex-wrap justify-center gap-4 mb-8 sm:mb-12">
-                <button class="px-6 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base">
-                    All Positions
+                <button class="category-filter px-6 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors text-sm sm:text-base" data-category="all">
+                    Semua Posisi
                 </button>
-                <button class="px-6 py-3 bg-white text-blue-600 rounded-full font-medium hover:bg-blue-50 transition-colors border border-blue-600 text-sm sm:text-base">
-                    Technology
-                </button>
-                <button class="px-6 py-3 bg-white text-blue-600 rounded-full font-medium hover:bg-blue-50 transition-colors border border-blue-600 text-sm sm:text-base">
-                    Business
-                </button>
-                <button class="px-6 py-3 bg-white text-blue-600 rounded-full font-medium hover:bg-blue-50 transition-colors border border-blue-600 text-sm sm:text-base">
-                    Marketing
-                </button>
+                
+                @foreach($departments as $department)
+                    <button class="category-filter px-6 py-3 bg-white text-blue-600 rounded-full font-medium hover:bg-blue-50 transition-colors border border-blue-600 text-sm sm:text-base" data-category="{{ Str::slug($department) }}">
+                        {{ $department }}
+                    </button>
+                @endforeach
             </div>
+            @endif
 
             <!-- Job Listings -->
-            <div class="space-y-6">
-                <!-- Job Data - Hardcoded for now -->
-                @php
-                $jobListings = [
-                [
-                'title' => 'Senior Frontend Developer',
-                'department' => 'Technology',
-                'location' => 'Jakarta',
-                'type' => 'Full-time',
-                'experience' => '3+ years',
-                'description' => 'Membangun dan mengoptimalkan aplikasi web menggunakan React.js dan Vue.js',
-                'urgent' => true,
-                'posted_date' => '2025-01-15'
-                ],
-                [
-                'title' => 'Business Analyst',
-                'department' => 'Business',
-                'location' => 'Surabaya',
-                'type' => 'Full-time',
-                'experience' => '2+ years',
-                'description' => 'Analisis kebutuhan bisnis dan memberikan solusi teknologi yang tepat',
-                'urgent' => false,
-                'posted_date' => '2025-01-10'
-                ],
-                [
-                'title' => 'Digital Marketing Specialist',
-                'department' => 'Marketing',
-                'location' => 'Jakarta',
-                'type' => 'Full-time',
-                'experience' => '2+ years',
-                'description' => 'Mengembangkan dan menjalankan strategi pemasaran digital',
-                'urgent' => true,
-                'posted_date' => '2025-01-05'
-                ],
-                [
-                'title' => 'IT Support Engineer',
-                'department' => 'Technology',
-                'location' => 'Bandung',
-                'type' => 'Contract',
-                'experience' => '1+ years',
-                'description' => 'Menyediakan dukungan teknis dan pemeliharaan sistem IT',
-                'urgent' => false,
-                'posted_date' => '2025-01-02'
-                ],
-                [
-                'title' => 'Project Manager',
-                'department' => 'Business',
-                'location' => 'Jakarta',
-                'type' => 'Full-time',
-                'experience' => '5+ years',
-                'description' => 'Memimpin dan mengelola proyek teknologi dari awal hingga selesai',
-                'urgent' => true,
-                'posted_date' => '2024-12-28'
-                ],
-                [
-                'title' => 'UI/UX Designer',
-                'department' => 'Design',
-                'location' => 'Remote',
-                'type' => 'Full-time',
-                'experience' => '2+ years',
-                'description' => 'Mendesain pengalaman pengguna yang intuitif dan menarik',
-                'urgent' => false,
-                'posted_date' => '2024-12-20'
-                ]
-                ];
-                @endphp
-
-                @foreach($jobListings as $index => $job)
-                <div class="group bg-white rounded-xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 border border-gray-200 hover:border-blue-300">
+            <div class="space-y-6" id="job-listings">
+                @forelse($jobListings as $job)
+                <div class="job-card group bg-white rounded-xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 border border-gray-200 hover:border-blue-300" 
+                     data-department="{{ Str::slug($job->department) }}"
+                     data-location="{{ Str::slug($job->location) }}">
                     <div class="flex flex-col lg:flex-row lg:items-center justify-between">
                         <!-- Job Info -->
                         <div class="mb-4 lg:mb-0 lg:mr-6 flex-1">
-                            <div class="flex items-center mb-2">
+                            <div class="flex flex-wrap items-center mb-2 gap-2">
                                 <h3 class="text-lg sm:text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors">
-                                    {{ $job['title'] }}
+                                    {{ $job->title }}
                                 </h3>
-                                @if($job['urgent'])
-                                <span class="ml-3 px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
+                                
+                                @if($job->is_urgent)
+                                <span class="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full">
                                     URGENT
+                                </span>
+                                @endif
+                                
+                                @if($job->is_remote)
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                                    REMOTE
                                 </span>
                                 @endif
                             </div>
 
                             <p class="text-gray-600 text-sm sm:text-base mb-4 leading-relaxed">
-                                {{ $job['description'] }}
+                                {{ $job->short_description }}
                             </p>
 
                             <!-- Job Details -->
-                            <div class="flex flex-wrap gap-3 sm:gap-4">
+                            <div class="flex flex-wrap gap-3 sm:gap-4 mb-4">
                                 <div class="flex items-center text-sm text-gray-600">
                                     <svg class="w-4 h-4 mr-2 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                     </svg>
-                                    <span class="truncate">{{ $job['department'] }}</span>
+                                    <span class="truncate">{{ $job->department }}</span>
                                 </div>
                                 <div class="flex items-center text-sm text-gray-600">
                                     <svg class="w-4 h-4 mr-2 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
-                                    <span class="truncate">{{ $job['location'] }}</span>
+                                    <span class="truncate">{{ $job->location }}</span>
                                 </div>
                                 <div class="flex items-center text-sm text-gray-600">
                                     <svg class="w-4 h-4 mr-2 text-purple-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
-                                    <span class="truncate">{{ $job['type'] }}</span>
+                                    <span class="truncate">{{ $job->employment_type }}</span>
                                 </div>
+                                @if($job->experience_level)
                                 <div class="flex items-center text-sm text-gray-600">
                                     <svg class="w-4 h-4 mr-2 text-orange-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                     </svg>
-                                    <span class="truncate">{{ $job['experience'] }} experience</span>
+                                    <span class="truncate">{{ $job->experience_level }}</span>
                                 </div>
+                                @endif
+                            </div>
+                            
+                            <!-- Posted Date & Deadline -->
+                            <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Diposting: {{ $job->created_at->translatedFormat('d F Y') }}
+                                </div>
+                                
+                                @if($job->application_deadline)
+                                <div class="flex items-center {{ now()->gt($job->application_deadline) ? 'text-red-600' : 'text-green-600' }}">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Deadline: {{ $job->application_deadline->translatedFormat('d F Y') }}
+                                </div>
+                                @endif
                             </div>
                         </div>
 
                         <!-- Apply Button -->
-                        <div class="flex-shrink-0">
-                            <a href="#"
-                                class="group/btn inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base">
-                                <span>Apply Now</span>
-                                <svg class="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </a>
+                        <div class="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-4 mt-4 lg:mt-0">
+                            @if($job->salary_range)
+                            <div class="text-right">
+                                <div class="text-sm font-semibold text-green-600">
+                                    {{ $job->salary_range }}
+                                </div>
+                                <div class="text-xs text-gray-500">Perkiraan gaji</div>
+                            </div>
+                            @endif
+                            
+                            <div class="flex-shrink-0">
+                                <a href="{{ route('frontend.career.show', $job->id) }}"
+                                    class="group/btn inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base">
+                                    <span>Lihat Detail</span>
+                                    <svg class="w-4 h-4 ml-2 transform group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <!-- No Jobs Available -->
+                <div class="text-center py-12">
+                    <div class="w-24 h-24 mx-auto mb-6 text-gray-400">
+                        <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-700 mb-2">Tidak ada lowongan tersedia</h3>
+                    <p class="text-gray-600 mb-6">Saat ini tidak ada lowongan yang tersedia. Silakan cek kembali lain waktu.</p>
+                    <a href="{{ route('frontend.contact') }}" 
+                       class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Hubungi Kami
+                    </a>
+                </div>
+                @endforelse
             </div>
+
+            <!-- Job Counter -->
+            @if($jobListings->count() > 0)
+            <div class="mt-8 text-center text-gray-600">
+                <p>Menampilkan <span class="font-bold text-blue-600">{{ $jobListings->count() }}</span> lowongan tersedia</p>
+            </div>
+            @endif
         </div>
     </div>
 </section>
@@ -457,4 +457,72 @@
             gap: 0.5rem;
         }
     }
+
+    .job-card {
+    transition: all 0.3s ease;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.category-filter {
+    transition: all 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .job-card .flex-col {
+        gap: 1rem;
+    }
+}
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.category-filter');
+    const jobCards = document.querySelectorAll('.job-card');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            filterButtons.forEach(btn => {
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-white', 'text-blue-600', 'border', 'border-blue-600');
+            });
+            
+            // Add active class to clicked button
+            this.classList.remove('bg-white', 'text-blue-600', 'border');
+            this.classList.add('bg-blue-600', 'text-white');
+            
+            const category = this.dataset.category;
+            let visibleCount = 0;
+            
+            // Filter job cards
+            jobCards.forEach(card => {
+                if (category === 'all' || card.dataset.department === category) {
+                    card.style.display = 'block';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 10);
+                    visibleCount++;
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(10px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+            
+            // Update counter
+            updateJobCounter(visibleCount);
+        });
+    });
+    
+    function updateJobCounter(count) {
+        const counterElement = document.querySelector('.job-counter');
+        if (counterElement) {
+            counterElement.innerHTML = `<p>Menampilkan <span class="font-bold text-blue-600">${count}</span> lowongan tersedia</p>`;
+        }
+    }
+});
+</script>
