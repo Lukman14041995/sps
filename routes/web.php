@@ -6,7 +6,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\UploadController;
-
+use App\Http\Controllers\CategoryCsrController;
+use App\Http\Controllers\CategoryLokerController;
+use App\Http\Controllers\Admin\BisnisKategoriController;
 // Hapus import duplicate atau perbaiki dengan alias
 use App\Http\Controllers\Admin\{
     DashboardController,
@@ -174,6 +176,12 @@ Route::prefix('admin')
             Route::get('/stats', [NewsCategoryController::class, 'stats'])->name('stats');
             Route::delete('/{id}', [NewsCategoryController::class, 'destroy'])->name('destroy');
         });
+        // MASTER CATEGORY CSR
+        // ===============================
+        Route::resource('category-csr', CategoryCsrController::class);
+        Route::resource('category-loker', CategoryLokerController::class);
+        Route::resource('bisnis-kategori', BisnisKategoriController::class);
+           Route::resource('bisnis-unit', BusinessUnitController::class);
     });
 
 require __DIR__ . '/auth.php';
