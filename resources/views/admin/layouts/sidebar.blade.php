@@ -66,13 +66,19 @@
             <span class="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full">5</span>
         </a>
 
-        <a href="{{ route('admin.contact.index') }}"
-            class="flex items-center space-x-3 p-3 rounded-lg transition duration-200 {{ Request::routeIs('contact.*') ? 'bg-gray-700 text-blue-300' : 'hover:bg-gray-700' }}">
-            <i
-                class="far fa-building w-5 text-center {{ Request::routeIs('contact.*') ? 'text-blue-400' : 'text-gray-400' }}"></i>
-            <span>Bussines Units</span>
-            <span class="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full">5</span>
-        </a>
+        @role('master')
+            <a href="{{ route('admin.bisnis-unit.index') }}"
+                class="flex items-center space-x-3 p-3 rounded-lg transition duration-200
+   {{ Request::routeIs('admin.bisnis-unit.*') ? 'bg-gray-700 text-blue-300' : 'hover:bg-gray-700' }}">
+
+                <i
+                    class="far fa-building w-5 text-center
+       {{ Request::routeIs('admin.bisnis-unit.*') ? 'text-blue-400' : 'text-gray-400' }}"></i>
+
+                <span>Business Units</span>
+            </a>
+        @endrole
+
 
         @if (auth()->check() && auth()->user()->hasRole('master'))
             <a href="{{ route('admin.users.index') }}"
@@ -84,7 +90,7 @@
                 <span>User Management</span>
             </a>
         @endif
-        
+
 
 
 
@@ -98,6 +104,44 @@
                 <span>News Categories</span>
                 <span class="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full">5</span>
             </a>
+            @role('master')
+                <a href="{{ route('admin.category-csr.index') }}"
+                    class="flex items-center space-x-3 p-3 rounded-lg transition duration-200 hover:bg-gray-700
+          {{ Request::routeIs('admin.category-csr.*') ? 'bg-gray-700' : '' }}">
+
+                    <i
+                        class="fas fa-layer-group w-5 text-center
+        {{ Request::routeIs('admin.category-csr.*') ? 'text-blue-400' : 'text-gray-400' }}"></i>
+
+                    <span>Master Category CSR</span>
+                </a>
+            @endrole
+            @role('master')
+                <a href="{{ route('admin.category-loker.index') }}"
+                    class="flex items-center space-x-3 p-3 rounded-lg transition duration-200 hover:bg-gray-700
+        {{ Request::routeIs('admin.category-loker.*') ? 'bg-gray-700' : '' }}">
+
+                    <i
+                        class="fas fa-briefcase w-5 text-center
+            {{ Request::routeIs('admin.category-loker.*') ? 'text-blue-400' : 'text-gray-400' }}"></i>
+
+                    <span>Master Category Loker</span>
+                </a>
+            @endrole
+            @role('master')
+                <a href="{{ route('admin.bisnis-kategori.index') }}"
+                    class="flex items-center space-x-3 p-3 rounded-lg transition duration-200 hover:bg-gray-700
+        {{ Request::routeIs('admin.bisnis-kategori.*') ? 'bg-gray-700' : '' }}">
+
+                    <i
+                        class="fas fa-store w-5 text-center
+        {{ Request::routeIs('admin.bisnis-kategori.*') ? 'text-blue-400' : 'text-gray-400' }}"></i>
+
+                    <span>Master Bisnis Kategori</span>
+                </a>
+            @endrole
+
+
             <a href="#"
                 class="flex items-center space-x-3 p-3 rounded-lg transition duration-200 hover:bg-gray-700">
                 <i class="fas fa-rectangle-list w-5 text-center text-gray-400"></i>
