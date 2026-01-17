@@ -46,23 +46,21 @@ class User extends Authenticatable
         ];
     }
 
-   public function roles()
-{
-    return $this->belongsToMany(Role::class);
-}
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
+    }
 
-public function hasRole($slug)
-{
-    return $this->roles()->where('slug', $slug)->exists();
-}
+    public function hasRole($slug)
+    {
+        return $this->roles()->where('slug', $slug)->exists();
+    }
 
-public function hasPermission($permission)
-{
-    return $this->roles()
-        ->whereHas('permissions', function ($q) use ($permission) {
-            $q->where('slug', $permission);
-        })->exists();
-}
-
-
+    public function hasPermission($permission)
+    {
+        return $this->roles()
+            ->whereHas('permissions', function ($q) use ($permission) {
+                $q->where('slug', $permission);
+            })->exists();
+    }
 }
