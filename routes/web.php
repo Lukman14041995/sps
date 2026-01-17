@@ -9,6 +9,8 @@ use App\Http\Controllers\UploadController;
 use App\Http\Controllers\CategoryCsrController;
 use App\Http\Controllers\CategoryLokerController;
 use App\Http\Controllers\Admin\BisnisKategoriController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\RoleController;
 // Hapus import duplicate atau perbaiki dengan alias
 use App\Http\Controllers\Admin\{
     DashboardController,
@@ -103,7 +105,7 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'role:master'])
+    ->middleware(['auth'])
     ->group(function () {
 
         // Dashboard
@@ -182,6 +184,8 @@ Route::prefix('admin')
         Route::resource('category-loker', CategoryLokerController::class);
         Route::resource('bisnis-kategori', BisnisKategoriController::class);
            Route::resource('bisnis-unit', BusinessUnitController::class);
+            Route::resource('menus', MenuController::class);
+            Route::resource('roles',RoleController::class);
     });
 
 require __DIR__ . '/auth.php';

@@ -37,7 +37,7 @@ class UserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make('$$admin$$'),
-    'must_change_password' => true, // 🔥 penting
+            'must_change_password' => true,
         ]);
 
         $user->roles()->sync($request->roles);
@@ -50,5 +50,46 @@ class UserController extends Controller
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'User berhasil dibuat & email aktivasi dikirim.');
+    }
+
+    // ✅ Tambahkan method edit
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', [
+            'user' => $user,
+            'roles' => Role::all()
+        ]);
+    }
+
+    // ✅ Tambahkan method update
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'roles' => 'required|array',
+        ]);
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+        ]);
+
+        $user->roles()->sync($request->roles);
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User berhasil diperbarui.');
+    }
+
+    // ✅ Tambahkan method destroy
+    public function destroy(User $user)
+    {
+        $user->roles()->detach();
+        $user->delete();
+
+        return redirect()
+            ->route('admin.users.index')
+            ->with('success', 'User berhasil dihapus.');
     }
 }
