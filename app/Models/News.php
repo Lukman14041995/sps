@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class News extends Model
@@ -156,21 +155,21 @@ class News extends Model
         return $this->getFeaturedImageUrl();
     }
 
-  public function getThumbnailUrlAttribute()
-{
-    if ($this->thumbnail_image && Storage::disk('s3')->exists($this->thumbnail_image)) {
-        return Storage::disk('s3')->url($this->thumbnail_image);
-    }
-    
-    return 'https://via.placeholder.com/48x48/cccccc/969696?text=No+Image';
-}
+    public function getThumbnailUrlAttribute()
+    {
+        if ($this->thumbnail_image) {
+            return asset('storage/'.$this->thumbnail_image);
+        }
 
-public function getFeaturedImageUrlAttribute()
-{
-    if ($this->featured_image && Storage::disk('s3')->exists($this->featured_image)) {
-        return Storage::disk('s3')->url($this->featured_image);
+        return asset('images/no-image.png'); // atau placeholder default kamu
     }
-    
-    return null;
-}
+
+    public function getFeaturedImageUrlAttribute()
+    {
+        if ($this->featured_image) {
+            return asset('storage/'.$this->featured_image);
+        }
+
+        return asset('images/default-news.jpg');
+    }
 }

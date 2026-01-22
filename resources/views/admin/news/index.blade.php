@@ -262,7 +262,7 @@
                                     <div class="flex-shrink-0 h-12 w-12">
                                         @if ($item->thumbnail_image)
                                             <img class="h-12 w-12 rounded-lg object-cover"
-                                                src="{{ Storage::disk('s3')->url($item->thumbnail_image) }}"
+                                                src="{{ Storage::disk('public')->url($item->thumbnail_image) }}"
                                                 alt="{{ $item->title }}" loading="lazy"
                                                 onerror="this.onerror=null;this.src='/images/no-image.png';">
                                         @else
