@@ -54,7 +54,6 @@ class NewsController extends Controller
             'archived' => News::where('status', 'archived')->count(),
         ];
 
-        
         return view('admin.news.index', compact('news', 'categories', 'stats'));
     }
 
@@ -84,28 +83,30 @@ class NewsController extends Controller
         ]);
 
         try {
-            // ✅ Upload images to MinIO (S3) with better error handling
-            if ($request->hasFile('featured_image') && $request->file('featured_image')->isValid()) {
-                $path = $request->file('featured_image')
-                    ->store('news/featured', 's3');
 
-                // Pastikan path disimpan dengan benar
-                $validated['featured_image'] = $path;
+            // ✅ Upload ke PUBLIC STORAGE (bukan MinIO)
+            if ($request->hasFile('featured_image') && $request->file('featured_image')->isValid()) {
+
+                $path = $request->file('featured_image')
+                    ->store('news/featured', 'public');
+
+                $validated['featured_image'] = $path; // simpan path saja
             }
 
             if ($request->hasFile('thumbnail_image') && $request->file('thumbnail_image')->isValid()) {
+
                 $path = $request->file('thumbnail_image')
-                    ->store('news/thumbnails', 's3');
+                    ->store('news/thumbnails', 'public');
 
                 $validated['thumbnail_image'] = $path;
             }
 
-            // Auto set published_at if status is published
+            // Auto set published_at
             if ($validated['status'] === 'published' && empty($validated['published_at'])) {
                 $validated['published_at'] = now();
             }
 
-            // Auto-generate author jika kosong
+            // Auto author
             if (empty($validated['author'])) {
                 $validated['author'] = Auth::user()->name ?? 'Admin';
             }
@@ -119,6 +120,7 @@ class NewsController extends Controller
                 ->with('success', 'News article created successfully!');
 
         } catch (\Exception $e) {
+
             return redirect()
                 ->back()
                 ->withInput()
@@ -151,7 +153,6 @@ class NewsController extends Controller
     {
         return view('admin.news.show', compact('news'));
     }
-    
 
     public function edit(News $news)
     {
@@ -167,8 +168,8 @@ class NewsController extends Controller
             'excerpt' => 'nullable|string|max:500',
             'content' => 'required|string',
             'category_id' => 'nullable|exists:news_categories,id',
-            'featured_image' => 'nullable|image|max:2048',
-            'thumbnail_image' => 'nullable|image|max:1024',
+            'featured_image' => 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif,webp',
+            'thumbnail_image' => 'nullable|image|max:1024|mimes:jpeg,png,jpg,gif,webp',
             'status' => 'required|in:draft,published,archived',
             'published_at' => 'nullable|date',
             'author' => 'nullable|string|max:100',
@@ -179,44 +180,48 @@ class NewsController extends Controller
             'remove_thumbnail_image' => 'nullable|boolean',
         ]);
 
-        // ✅ Remove featured image (MinIO)
+        /* ================= REMOVE IMAGE ================= */
+
         if ($request->boolean('remove_featured_image')) {
-            if ($news->featured_image && Storage::disk('s3')->exists($news->featured_image)) {
-                Storage::disk('s3')->delete($news->featured_image);
+            if ($news->featured_image) {
+                Storage::disk('public')->delete($news->featured_image);
             }
             $validated['featured_image'] = null;
         }
 
-        // ✅ Remove thumbnail image (MinIO)
         if ($request->boolean('remove_thumbnail_image')) {
-            if ($news->thumbnail_image && Storage::disk('s3')->exists($news->thumbnail_image)) {
-                Storage::disk('s3')->delete($news->thumbnail_image);
+            if ($news->thumbnail_image) {
+                Storage::disk('public')->delete($news->thumbnail_image);
             }
             $validated['thumbnail_image'] = null;
         }
 
-        // ✅ Upload featured image
+        /* ================= UPLOAD NEW IMAGE ================= */
+
         if ($request->hasFile('featured_image')) {
-            if ($news->featured_image && Storage::disk('s3')->exists($news->featured_image)) {
-                Storage::disk('s3')->delete($news->featured_image);
+
+            if ($news->featured_image) {
+                Storage::disk('public')->delete($news->featured_image);
             }
 
             $validated['featured_image'] = $request->file('featured_image')
-                ->store('news/featured', 's3');
+                ->store('news/featured', 'public');
         }
 
-        // ✅ Upload thumbnail image
         if ($request->hasFile('thumbnail_image')) {
-            if ($news->thumbnail_image && Storage::disk('s3')->exists($news->thumbnail_image)) {
-                Storage::disk('s3')->delete($news->thumbnail_image);
+
+            if ($news->thumbnail_image) {
+                Storage::disk('public')->delete($news->thumbnail_image);
             }
 
             $validated['thumbnail_image'] = $request->file('thumbnail_image')
-                ->store('news/thumbnails', 's3');
+                ->store('news/thumbnails', 'public');
         }
 
-        // Update slug if title changed
+        /* ================= SLUG ================= */
+
         if ($news->title !== $validated['title']) {
+
             $validated['slug'] = Str::slug($validated['title']);
 
             $count = News::where('slug', $validated['slug'])
@@ -228,7 +233,8 @@ class NewsController extends Controller
             }
         }
 
-        // Auto published_at
+        /* ================= PUBLISH DATE ================= */
+
         if ($validated['status'] === 'published' && empty($validated['published_at'])) {
             $validated['published_at'] = now();
         }
@@ -242,7 +248,6 @@ class NewsController extends Controller
 
     public function destroy(News $news)
     {
-        // Delete images
         if ($news->featured_image) {
             Storage::disk('public')->delete($news->featured_image);
         }
@@ -253,7 +258,8 @@ class NewsController extends Controller
 
         $news->delete();
 
-        return redirect()->route('admin.news.index')
+        return redirect()
+            ->route('admin.news.index')
             ->with('success', 'News article deleted successfully.');
     }
 
@@ -266,10 +272,12 @@ class NewsController extends Controller
         ]);
 
         try {
+
             $ids = $request->ids;
             $action = $request->action;
 
             switch ($action) {
+
                 case 'publish':
                     News::whereIn('id', $ids)->update([
                         'status' => 'published',
@@ -289,17 +297,22 @@ class NewsController extends Controller
                     break;
 
                 case 'delete':
+
                     $articles = News::whereIn('id', $ids)->get();
+
                     foreach ($articles as $article) {
-                        // Delete images from storage
+
                         if ($article->featured_image) {
-                            Storage::disk('s3')->delete($article->featured_image);
+                            Storage::disk('public')->delete($article->featured_image);
                         }
+
                         if ($article->thumbnail_image) {
-                            Storage::disk('s3')->delete($article->thumbnail_image);
+                            Storage::disk('public')->delete($article->thumbnail_image);
                         }
+
                         $article->delete();
                     }
+
                     $message = 'Selected articles have been deleted';
                     break;
 
@@ -310,14 +323,16 @@ class NewsController extends Controller
             return redirect()->back()->with('success', $message);
 
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to perform bulk action: '.$e->getMessage());
+
+            return redirect()->back()
+                ->with('error', 'Failed to perform bulk action: '.$e->getMessage());
         }
     }
 
     public function updateStatus(Request $request, News $news)
     {
         $request->validate([
-            'status' => 'required|in:draft,published,archived'
+            'status' => 'required|in:draft,published,archived',
         ]);
 
         try {
@@ -325,12 +340,12 @@ class NewsController extends Controller
             $newStatus = $request->status;
 
             $news->status = $newStatus;
-            
+
             // If publishing and no published_at date, set it
-            if ($newStatus === 'published' && !$news->published_at) {
+            if ($newStatus === 'published' && ! $news->published_at) {
                 $news->published_at = now();
             }
-            
+
             $news->save();
 
             return response()->json([
@@ -338,16 +353,15 @@ class NewsController extends Controller
                 'message' => 'Status updated successfully',
                 'data' => [
                     'old_status' => $oldStatus,
-                    'new_status' => $newStatus
-                ]
+                    'new_status' => $newStatus,
+                ],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to update status: ' . $e->getMessage()
+                'message' => 'Failed to update status: '.$e->getMessage(),
             ], 500);
         }
     }
-
 }
