@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class News extends Model
@@ -30,7 +31,7 @@ class News extends Model
         'shares',
         'category_id',
         'created_by',
-        'updated_by'
+        'updated_by',
     ];
 
     protected $casts = [
@@ -44,7 +45,7 @@ class News extends Model
         'published_at',
         'created_at',
         'updated_at',
-        'deleted_at'
+        'deleted_at',
     ];
 
     protected static function boot()
@@ -67,7 +68,7 @@ class News extends Model
             }
 
             if (Auth::check()) {
-                $news->updated_by =  Auth::id();
+                $news->updated_by = Auth::id();
             }
         });
     }
@@ -133,24 +134,43 @@ class News extends Model
     {
         $wordCount = str_word_count(strip_tags($this->content));
         $readingTime = ceil($wordCount / 200);
+
         return max(1, $readingTime);
     }
 
     public function getFeaturedImageUrl()
     {
         if ($this->featured_image) {
-            return asset('storage/' . $this->featured_image);
+            return asset('storage/'.$this->featured_image);
         }
+
         return asset('images/default-news.jpg');
     }
 
     public function getThumbnailUrl()
     {
         if ($this->thumbnail_image) {
-            return asset('storage/' . $this->thumbnail_image);
+            return asset('storage/'.$this->thumbnail_image);
         }
+
         return $this->getFeaturedImageUrl();
     }
 
+  public function getThumbnailUrlAttribute()
+{
+    if ($this->thumbnail_image && Storage::disk('s3')->exists($this->thumbnail_image)) {
+        return Storage::disk('s3')->url($this->thumbnail_image);
+    }
     
+    return 'https://via.placeholder.com/48x48/cccccc/969696?text=No+Image';
+}
+
+public function getFeaturedImageUrlAttribute()
+{
+    if ($this->featured_image && Storage::disk('s3')->exists($this->featured_image)) {
+        return Storage::disk('s3')->url($this->featured_image);
+    }
+    
+    return null;
+}
 }

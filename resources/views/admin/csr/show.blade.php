@@ -24,7 +24,7 @@
     {{-- Featured Image --}}
     @if($csr->featured_image)
         <div class="mb-6">
-            <img src="{{ Storage::url($csr->featured_image) }}" alt="{{ $csr->title }}" class="w-full max-w-3xl h-auto rounded-lg border border-gray-300">
+            <img src="{{ Storage::disk('s3')->url($csr->featured_image) }}" alt="{{ $csr->title }}" class="w-full max-w-3xl h-auto rounded-lg border border-gray-300">
         </div>
     @endif
 
@@ -98,7 +98,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 @foreach ($csr->gallery_images as $image)
                     <div class="rounded overflow-hidden border border-gray-200">
-                        <img src="{{ $image['url'] ?? '' }}" alt="Gallery Image" class="w-full h-48 object-cover">
+                        <img src="{{ Storage::disk('s3')->url($image) }}" alt="Gallery Image" class="w-full h-48 object-cover">
                     </div>
                 @endforeach
             </div>

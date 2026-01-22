@@ -403,7 +403,7 @@
                     <div>
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Featured Image</h3>
                         @if($news->featured_image)
-                            <img src="{{ asset('storage/' . $news->featured_image) }}" 
+                            <img src="{{ Storage::disk('s3')->url($news->featured_image) }}" 
                                  alt="{{ $news->title }}" 
                                  class="article-image w-full">
                         @else
@@ -421,7 +421,7 @@
                         <h3 class="text-lg font-semibold text-gray-800 mb-4">Thumbnail Image</h3>
                         @if($news->thumbnail_image)
                             <div class="flex flex-col items-center">
-                                <img src="{{ asset('storage/' . $news->thumbnail_image) }}" 
+                                <img src="{{ Storage::disk('s3')->url($news->thumbnail_image) }}" 
                                      alt="{{ $news->title }} Thumbnail" 
                                      class="article-thumbnail mb-4">
                                 <p class="text-sm text-gray-600">Preview size: 120×120px</p>

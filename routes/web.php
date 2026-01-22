@@ -5,6 +5,24 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\UploadController;
+use App\Http\Controllers\CategoryCsrController;
+use App\Http\Controllers\CategoryLokerController;
+use App\Http\Controllers\Admin\BisnisKategoriController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\RoleController;
+// Hapus import duplicate atau perbaiki dengan alias
+use App\Http\Controllers\Admin\{
+    DashboardController,
+    UserController,
+    AboutController,
+    BusinessUnitController,
+    CareerController,
+    ContactController,
+    CsrController,
+    NewsController as AdminNewsController, // Beri alias
+    NewsCategoryController
+};
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +30,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 |--------------------------------------------------------------------------
 | Tidak perlu login
 */
+// routes/web.php
 Route::controller(PageController::class)
     ->name('frontend.')
     ->group(function () {
@@ -19,10 +38,23 @@ Route::controller(PageController::class)
         Route::get('/about', 'about')->name('about');
         Route::get('/business-units', 'business')->name('business.units');
         Route::get('/news', 'news')->name('news.index');
+        Route::get('/news/{slug}', 'showNews')->name('news.show');
         Route::get('/csr', 'csr')->name('csr.index');
+        Route::get('/csr/{slug}', 'csrShow')->name('csr.show');
         Route::get('/career', 'career')->name('career.index');
+        Route::get('/career/{id}', 'careerDetail')->name('career.show'); // Tambahkan route detail
         Route::get('/contact', 'contact')->name('contact');
     });
+/*
+|--------------------------------------------------------------------------
+| UPLOAD ROUTES (Untuk semua yang memerlukan upload)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('upload')->name('upload.')->middleware('auth')->group(function () {
+    Route::post('/image', [UploadController::class, 'storeImage'])->name('image.store');
+    Route::post('/file', [UploadController::class, 'storeFile'])->name('file.store');
+    Route::post('/summernote', [UploadController::class, 'storeSummernote'])->name('summernote.store');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -70,21 +102,10 @@ Route::middleware('auth')->group(function () {
 | ADMIN ROUTES (MASTER ONLY)
 |--------------------------------------------------------------------------
 */
-use App\Http\Controllers\Admin\{
-    DashboardController,
-    UserController,
-    AboutController,
-    BusinessUnitController,
-    CareerController,
-    ContactController,
-    CsrController,
-    NewsController,
-    NewsCategoryController
-};
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth', 'role:master'])
+    ->middleware(['auth'])
     ->group(function () {
 
         // Dashboard
@@ -103,22 +124,23 @@ Route::prefix('admin')
 
         // CSR
         Route::resource('csr', CsrController::class);
-          Route::get('/csr/{csr}/edit-json', [CsrController::class, 'editJson'])
-         ->name('csr.edit.json');
+        Route::get('/csr/{csr}/edit-json', [CsrController::class, 'editJson'])
+            ->name('csr.edit.json');
         Route::post('/csr/bulk-action', [CsrController::class, 'bulkAction'])
             ->name('csr.bulk-action');
 
         // Career
-        // Career - Resource dengan nama singular
-Route::resource('career', CareerController::class)->names([
-    'index' => 'career.index',
-    'create' => 'career.create',
-    'store' => 'career.store',
-    'show' => 'career.show',
-    'edit' => 'career.edit',
-    'update' => 'career.update',
-    'destroy' => 'career.destroy',
-]);
+        Route::resource('career', CareerController::class)->names([
+            'index' => 'career.index',
+            'create' => 'career.create',
+            'store' => 'career.store',
+            'show' => 'career.show',
+            'edit' => 'career.edit',
+            'update' => 'career.update',
+            'destroy' => 'career.destroy',
+        ]);
+
+        // Contact
         Route::resource('contact', ContactController::class)
             ->except(['create', 'store']);
 
@@ -128,17 +150,18 @@ Route::resource('career', CareerController::class)->names([
         |--------------------------------------------------------------------------
         */
         Route::prefix('news')->name('news.')->group(function () {
-           Route::get('/', [NewsController::class, 'index'])->name('index');
-Route::get('/create', [NewsController::class, 'create'])->name('create');
-Route::post('/', [NewsController::class, 'store'])->name('store');
-
-Route::get('/{news}', [NewsController::class, 'show'])->name('show'); // ← WAJIB DI SINI
-Route::get('/{news}/edit', [NewsController::class, 'edit'])->name('edit');
-Route::put('/{news}', [NewsController::class, 'update'])->name('update');
-Route::delete('/{news}', [NewsController::class, 'destroy'])->name('destroy');
-            Route::post('/bulk-action', [NewsController::class, 'bulkAction'])->name('bulk-action');
-            Route::post('/{news}/update-status', [NewsController::class, 'updateStatus'])->name('update-status');
-            Route::post('/preview', [NewsController::class, 'preview'])->name('preview');
+            Route::get('/', [AdminNewsController::class, 'index'])->name('index');
+            Route::get('/create', [AdminNewsController::class, 'create'])->name('create');
+            Route::post('/', [AdminNewsController::class, 'store'])->name('store');
+            Route::get('/{news}', [AdminNewsController::class, 'show'])->name('show');
+            Route::get('/{news}/edit', [AdminNewsController::class, 'edit'])->name('edit');
+            Route::put('/{news}', [AdminNewsController::class, 'update'])->name('update');
+            Route::patch('/{news}', [AdminNewsController::class, 'update'])->name('update');
+            Route::delete('/{news}', [AdminNewsController::class, 'destroy'])->name('destroy');
+            Route::post('/bulk-action', [AdminNewsController::class, 'bulkAction'])->name('bulk-action');
+            Route::post('/{news}/update-status', [AdminNewsController::class, 'updateStatus'])->name('update-status');
+            Route::post('/preview', [AdminNewsController::class, 'preview'])->name('preview');
+            Route::post('/generate-slug', [AdminNewsController::class, 'generateSlug'])->name('generate-slug');
         });
 
         /*
@@ -155,6 +178,14 @@ Route::delete('/{news}', [NewsController::class, 'destroy'])->name('destroy');
             Route::get('/stats', [NewsCategoryController::class, 'stats'])->name('stats');
             Route::delete('/{id}', [NewsCategoryController::class, 'destroy'])->name('destroy');
         });
+        // MASTER CATEGORY CSR
+        // ===============================
+        Route::resource('category-csr', CategoryCsrController::class);
+        Route::resource('category-loker', CategoryLokerController::class);
+        Route::resource('bisnis-kategori', BisnisKategoriController::class);
+           Route::resource('bisnis-unit', BusinessUnitController::class);
+            Route::resource('menus', MenuController::class);
+            Route::resource('roles',RoleController::class);
     });
 
 require __DIR__ . '/auth.php';
