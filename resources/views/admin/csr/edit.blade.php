@@ -29,8 +29,9 @@
                     <div class="p-8">
                         <!-- Basic Information -->
                         <div class="mb-10">
-                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Basic Information</h3>
-                            
+                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Basic Information
+                            </h3>
+
                             <!-- Title -->
                             <div class="mb-6">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -50,12 +51,12 @@
                                     Category *
                                 </label>
                                 <div class="grid grid-cols-3 gap-4">
-                                    @foreach(['social' => 'Social', 'environment' => 'Environment', 'quality' => 'Quality'] as $key => $label)
+                                    @foreach (['social' => 'Social', 'environment' => 'Environment', 'quality' => 'Quality'] as $key => $label)
                                         @php
                                             $colors = [
                                                 'social' => '#3B82F6',
-                                                'environment' => '#10B981', 
-                                                'quality' => '#F59E0B'
+                                                'environment' => '#10B981',
+                                                'quality' => '#F59E0B',
                                             ];
                                             $color = $colors[$key] ?? '#6B7280';
                                         @endphp
@@ -70,19 +71,22 @@
                                                     @if ($key == 'social')
                                                         <svg class="w-5 h-5" style="color: {{ $color }}"
                                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
                                                                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                                                         </svg>
                                                     @elseif($key == 'environment')
                                                         <svg class="w-5 h-5" style="color: {{ $color }}"
                                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
                                                                 d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4 4 0 003 15z" />
                                                         </svg>
                                                     @elseif($key == 'quality')
                                                         <svg class="w-5 h-5" style="color: {{ $color }}"
                                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
                                                                 d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                                         </svg>
                                                     @endif
@@ -126,7 +130,8 @@
 
                         <!-- Program Details -->
                         <div class="mb-10">
-                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Program Details</h3>
+                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Program Details
+                            </h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Location -->
                                 <div>
@@ -180,7 +185,8 @@
                                         Beneficiaries Count
                                     </label>
                                     <input type="number" name="beneficiaries_count"
-                                        value="{{ old('beneficiaries_count', $csr->beneficiaries_count) }}" min="0"
+                                        value="{{ old('beneficiaries_count', $csr->beneficiaries_count) }}"
+                                        min="0"
                                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200"
                                         placeholder="Number of people impacted">
                                     @error('beneficiaries_count')
@@ -219,19 +225,20 @@
 
                         <!-- Media & Results -->
                         <div class="mb-10">
-                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Media & Results</h3>
+                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Media & Results
+                            </h3>
 
                             <!-- Featured Image -->
                             <div class="mb-8">
                                 <label class="block text-sm font-medium text-gray-700 mb-4">
                                     Featured Image
                                 </label>
-                                
-                                @if($csr->featured_image)
+
+                                @if ($csr->featured_image)
                                     <div class="mb-4 flex items-center gap-4">
-                                        <img src="{{ Storage::disk('s3')->url($csr->featured_image) }}"
-                                            alt="Current featured image"
+                                        <img src="{{ $csr->featured_image_url }}" alt="Current featured image"
                                             class="w-48 h-32 object-cover rounded-lg shadow-sm">
+
                                         <div>
                                             <label class="inline-flex items-center">
                                                 <input type="checkbox" name="remove_featured_image" value="1"
@@ -241,7 +248,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                
+
                                 <input type="file" name="featured_image" accept="image/*"
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200">
                                 <p class="mt-1 text-xs text-gray-500">Recommended: 1200x630px • Max: 2MB</p>
@@ -255,7 +262,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-4">
                                     Gallery Images <span class="text-gray-500 text-xs">(Optional)</span>
                                 </label>
-                                
+
                                 @php
                                     $galleryImages = [];
                                     if ($csr->gallery_images) {
@@ -268,21 +275,22 @@
                                     }
                                 @endphp
 
-                                @if(count($galleryImages) > 0)
+                                @if (count($galleryImages) > 0)
                                     <div class="mb-6">
                                         <p class="text-sm text-gray-600 mb-3">Current Gallery Images:</p>
                                         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
-                                            @foreach($galleryImages as $index => $image)
-                                                @if(is_string($image))
+                                            @foreach ($galleryImages as $index => $image)
+                                                @if (is_string($image))
                                                     <div class="relative group">
-                                                        <img src="{{ Storage::disk('s3')->url($image) }}" 
-                                                             alt="Gallery image {{ $index + 1 }}"
-                                                             class="w-full h-32 object-cover rounded-lg shadow-sm">
+                                                        <img src="{{ asset('storage/' . $image) }}"
+                                                            alt="Gallery image {{ $index + 1 }}"
+                                                            class="w-full h-32 object-cover rounded-lg shadow-sm">
+
                                                         <div class="absolute top-2 right-2">
                                                             <label class="inline-flex items-center">
-                                                                <input type="checkbox" name="remove_gallery_images[]" 
-                                                                       value="{{ $image }}"
-                                                                       class="rounded border-gray-300 text-red-600 focus:ring-red-500">
+                                                                <input type="checkbox" name="remove_gallery_images[]"
+                                                                    value="{{ $image }}"
+                                                                    class="rounded border-gray-300 text-red-600 focus:ring-red-500">
                                                                 <span class="sr-only">Remove image</span>
                                                             </label>
                                                         </div>
@@ -292,7 +300,7 @@
                                         </div>
                                     </div>
                                 @endif
-                                
+
                                 <input type="file" name="gallery_images[]" accept="image/*" multiple
                                     class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition duration-200">
                                 <p class="mt-1 text-xs text-gray-500">Multiple images allowed • Max: 2MB per image</p>
@@ -332,7 +340,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-4">
                                     Impact Metrics (Optional)
                                 </label>
-                                
+
                                 <div id="impactMetricsContainer" class="space-y-4">
                                     @php
                                         $impactMetrics = [];
@@ -350,27 +358,25 @@
                                         }
                                     @endphp
 
-                                    @foreach($impactMetrics as $index => $metric)
-                                        <div class="impact-metric-item flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                                    @foreach ($impactMetrics as $index => $metric)
+                                        <div
+                                            class="impact-metric-item flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                                             <div class="flex-1">
-                                                <input type="text" name="impact_metrics[{{ $index }}][name]" 
-                                                    value="{{ $metric['name'] ?? '' }}"
-                                                    placeholder="Metric name"
+                                                <input type="text" name="impact_metrics[{{ $index }}][name]"
+                                                    value="{{ $metric['name'] ?? '' }}" placeholder="Metric name"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                             </div>
                                             <div class="w-32">
                                                 <input type="text" name="impact_metrics[{{ $index }}][value]"
-                                                    value="{{ $metric['value'] ?? '' }}"
-                                                    placeholder="Value"
+                                                    value="{{ $metric['value'] ?? '' }}" placeholder="Value"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                             </div>
                                             <div class="w-24">
                                                 <input type="text" name="impact_metrics[{{ $index }}][unit]"
-                                                    value="{{ $metric['unit'] ?? '' }}"
-                                                    placeholder="Unit"
+                                                    value="{{ $metric['unit'] ?? '' }}" placeholder="Unit"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                             </div>
-                                            @if(!$loop->first)
+                                            @if (!$loop->first)
                                                 <button type="button" onclick="removeImpactMetric(this)"
                                                     class="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
                                                     Remove
@@ -390,7 +396,7 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-4">
                                     Team Members (Optional)
                                 </label>
-                                
+
                                 <div id="teamMembersContainer" class="space-y-4">
                                     @php
                                         $teamMembers = [];
@@ -408,21 +414,20 @@
                                         }
                                     @endphp
 
-                                    @foreach($teamMembers as $index => $member)
-                                        <div class="team-member-item flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                                    @foreach ($teamMembers as $index => $member)
+                                        <div
+                                            class="team-member-item flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                                             <div class="flex-1">
-                                                <input type="text" name="team_members[{{ $index }}][name]" 
-                                                    value="{{ $member['name'] ?? '' }}"
-                                                    placeholder="Name"
+                                                <input type="text" name="team_members[{{ $index }}][name]"
+                                                    value="{{ $member['name'] ?? '' }}" placeholder="Name"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                             </div>
                                             <div class="flex-1">
                                                 <input type="text" name="team_members[{{ $index }}][role]"
-                                                    value="{{ $member['role'] ?? '' }}"
-                                                    placeholder="Role"
+                                                    value="{{ $member['role'] ?? '' }}" placeholder="Role"
                                                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                             </div>
-                                            @if(!$loop->first)
+                                            @if (!$loop->first)
                                                 <button type="button" onclick="removeTeamMember(this)"
                                                     class="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200">
                                                     Remove
@@ -440,7 +445,8 @@
 
                         <!-- Publishing Options -->
                         <div class="mb-10">
-                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Publishing Options</h3>
+                            <h3 class="text-xl font-bold text-gray-900 mb-6 pb-3 border-b border-gray-200">Publishing
+                                Options</h3>
 
                             <!-- Status -->
                             <div class="mb-8">
@@ -454,12 +460,14 @@
                                             class="sr-only peer">
                                         <div
                                             class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl cursor-pointer transition duration-200 hover:border-yellow-300 peer-checked:border-yellow-500 peer-checked:bg-yellow-50">
-                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-yellow-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-yellow-500 mb-3"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                             <span class="text-sm font-medium peer-checked:text-yellow-700">Draft</span>
-                                            <p class="text-xs text-gray-500 mt-1 text-center">Save as draft for later editing</p>
+                                            <p class="text-xs text-gray-500 mt-1 text-center">Save as draft for later
+                                                editing</p>
                                         </div>
                                     </label>
                                     <label class="relative">
@@ -468,12 +476,14 @@
                                             class="sr-only peer">
                                         <div
                                             class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl cursor-pointer transition duration-200 hover:border-green-300 peer-checked:border-green-500 peer-checked:bg-green-50">
-                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-green-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-green-500 mb-3"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                             </svg>
                                             <span class="text-sm font-medium peer-checked:text-green-700">Publish</span>
-                                            <p class="text-xs text-gray-500 mt-1 text-center">Make program publicly visible</p>
+                                            <p class="text-xs text-gray-500 mt-1 text-center">Make program publicly visible
+                                            </p>
                                         </div>
                                     </label>
                                     <label class="relative">
@@ -482,7 +492,8 @@
                                             class="sr-only peer">
                                         <div
                                             class="flex flex-col items-center p-6 border-2 border-gray-200 rounded-xl cursor-pointer transition duration-200 hover:border-blue-300 peer-checked:border-blue-500 peer-checked:bg-blue-50">
-                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-blue-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-8 h-8 text-gray-400 peer-checked:text-blue-500 mb-3"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                                             </svg>
@@ -567,115 +578,115 @@
 @endsection
 
 @push('scripts')
-<script>
-    let impactMetricCount = {{ count($impactMetrics ?? []) }};
-    let teamMemberCount = {{ count($teamMembers ?? []) }};
+    <script>
+        let impactMetricCount = {{ count($impactMetrics ?? []) }};
+        let teamMemberCount = {{ count($teamMembers ?? []) }};
 
-    // Inisialisasi saat halaman dimuat
-    document.addEventListener('DOMContentLoaded', function() {
-        setupSaveAsDraft();
-        setupFormValidation();
-        
-        console.log('Form ready for submission');
-    });
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSaveAsDraft();
+            setupFormValidation();
 
-    // Setup save as draft button
-    function setupSaveAsDraft() {
-        const saveDraftBtn = document.getElementById('saveAsDraftBtn');
-        if (saveDraftBtn) {
-            saveDraftBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                console.log('Save as Draft clicked');
-                
-                // Set status ke draft
-                const draftRadio = document.getElementById('status_draft');
-                if (draftRadio) {
-                    draftRadio.checked = true;
-                    console.log('Status set to draft');
-                }
-                
-                // Validasi form sebelum submit
-                if (validateForm()) {
-                    console.log('Form validated, submitting...');
-                    document.getElementById('editCsrForm').submit();
-                }
-            });
-        }
-    }
+            console.log('Form ready for submission');
+        });
 
-    // Setup form validation
-    function setupFormValidation() {
-        const form = document.getElementById('editCsrForm');
-        if (form) {
-            console.log('Form validation setup complete');
-            
-            form.addEventListener('submit', function(e) {
-                console.log('Form submit triggered');
-                
-                if (!validateForm()) {
+        // Setup save as draft button
+        function setupSaveAsDraft() {
+            const saveDraftBtn = document.getElementById('saveAsDraftBtn');
+            if (saveDraftBtn) {
+                saveDraftBtn.addEventListener('click', function(e) {
                     e.preventDefault();
-                    console.log('Form validation failed');
-                    return false;
-                }
-                
-                console.log('Form validation passed');
-                return true;
-            });
-        }
-    }
+                    console.log('Save as Draft clicked');
 
-    // Validasi form
-    function validateForm() {
-        console.log('Validating form...');
-        
-        const title = document.querySelector('input[name="title"]').value.trim();
-        const content = document.querySelector('textarea[name="content"]').value.trim();
-        const category = document.querySelector('input[name="category"]:checked');
-        const status = document.querySelector('input[name="status"]:checked');
-        
-        let errors = [];
-        
-        if (!title) {
-            errors.push('Please enter program title');
-        }
-        if (!category) {
-            errors.push('Please select a category');
-        }
-        if (!content) {
-            errors.push('Please enter program description');
-        }
-        if (!status) {
-            errors.push('Please select a status (Draft, Publish, or Archive)');
-        }
-        
-        // Validasi tambahan untuk beneficiaries count
-        const beneficiaries = document.querySelector('input[name="beneficiaries_count"]');
-        if (beneficiaries && beneficiaries.value && beneficiaries.value < 0) {
-            errors.push('Beneficiaries count cannot be negative');
-        }
-        
-        // Validasi budget jika diisi
-        const budget = document.querySelector('input[name="budget"]');
-        if (budget && budget.value && budget.value < 0) {
-            errors.push('Budget cannot be negative');
-        }
-        
-        if (errors.length > 0) {
-            alert(errors.join('\n'));
-            console.log('Validation errors:', errors);
-            return false;
-        }
-        
-        console.log('Form validation passed');
-        return true;
-    }
+                    // Set status ke draft
+                    const draftRadio = document.getElementById('status_draft');
+                    if (draftRadio) {
+                        draftRadio.checked = true;
+                        console.log('Status set to draft');
+                    }
 
-    // Dynamic fields untuk impact metrics
-    function addImpactMetric() {
-        const container = document.getElementById('impactMetricsContainer');
-        const newItem = document.createElement('div');
-        newItem.className = 'impact-metric-item flex flex-col sm:flex-row gap-3 items-start sm:items-center';
-        newItem.innerHTML = `
+                    // Validasi form sebelum submit
+                    if (validateForm()) {
+                        console.log('Form validated, submitting...');
+                        document.getElementById('editCsrForm').submit();
+                    }
+                });
+            }
+        }
+
+        // Setup form validation
+        function setupFormValidation() {
+            const form = document.getElementById('editCsrForm');
+            if (form) {
+                console.log('Form validation setup complete');
+
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submit triggered');
+
+                    if (!validateForm()) {
+                        e.preventDefault();
+                        console.log('Form validation failed');
+                        return false;
+                    }
+
+                    console.log('Form validation passed');
+                    return true;
+                });
+            }
+        }
+
+        // Validasi form
+        function validateForm() {
+            console.log('Validating form...');
+
+            const title = document.querySelector('input[name="title"]').value.trim();
+            const content = document.querySelector('textarea[name="content"]').value.trim();
+            const category = document.querySelector('input[name="category"]:checked');
+            const status = document.querySelector('input[name="status"]:checked');
+
+            let errors = [];
+
+            if (!title) {
+                errors.push('Please enter program title');
+            }
+            if (!category) {
+                errors.push('Please select a category');
+            }
+            if (!content) {
+                errors.push('Please enter program description');
+            }
+            if (!status) {
+                errors.push('Please select a status (Draft, Publish, or Archive)');
+            }
+
+            // Validasi tambahan untuk beneficiaries count
+            const beneficiaries = document.querySelector('input[name="beneficiaries_count"]');
+            if (beneficiaries && beneficiaries.value && beneficiaries.value < 0) {
+                errors.push('Beneficiaries count cannot be negative');
+            }
+
+            // Validasi budget jika diisi
+            const budget = document.querySelector('input[name="budget"]');
+            if (budget && budget.value && budget.value < 0) {
+                errors.push('Budget cannot be negative');
+            }
+
+            if (errors.length > 0) {
+                alert(errors.join('\n'));
+                console.log('Validation errors:', errors);
+                return false;
+            }
+
+            console.log('Form validation passed');
+            return true;
+        }
+
+        // Dynamic fields untuk impact metrics
+        function addImpactMetric() {
+            const container = document.getElementById('impactMetricsContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'impact-metric-item flex flex-col sm:flex-row gap-3 items-start sm:items-center';
+            newItem.innerHTML = `
             <div class="flex-1">
                 <input type="text" name="impact_metrics[${impactMetricCount}][name]" 
                     placeholder="Metric name"
@@ -696,26 +707,29 @@
                 Remove
             </button>
         `;
-        container.appendChild(newItem);
-        impactMetricCount++;
-        
-        // Update tombol Add Metric
-        const addButton = container.nextElementSibling;
-        if (addButton && addButton.textContent.includes('Add Metric')) {
-            addButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            container.appendChild(newItem);
+            impactMetricCount++;
+
+            // Update tombol Add Metric
+            const addButton = container.nextElementSibling;
+            if (addButton && addButton.textContent.includes('Add Metric')) {
+                addButton.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            }
         }
-    }
 
-    function removeImpactMetric(button) {
-        button.closest('.impact-metric-item').remove();
-    }
+        function removeImpactMetric(button) {
+            button.closest('.impact-metric-item').remove();
+        }
 
-    // Dynamic fields untuk team members
-    function addTeamMember() {
-        const container = document.getElementById('teamMembersContainer');
-        const newItem = document.createElement('div');
-        newItem.className = 'team-member-item flex flex-col sm:flex-row gap-3 items-start sm:items-center';
-        newItem.innerHTML = `
+        // Dynamic fields untuk team members
+        function addTeamMember() {
+            const container = document.getElementById('teamMembersContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'team-member-item flex flex-col sm:flex-row gap-3 items-start sm:items-center';
+            newItem.innerHTML = `
             <div class="flex-1">
                 <input type="text" name="team_members[${teamMemberCount}][name]" 
                     placeholder="Name"
@@ -731,40 +745,43 @@
                 Remove
             </button>
         `;
-        container.appendChild(newItem);
-        teamMemberCount++;
-        
-        // Update tombol Add Member
-        const addButton = container.nextElementSibling;
-        if (addButton && addButton.textContent.includes('Add Member')) {
-            addButton.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    }
+            container.appendChild(newItem);
+            teamMemberCount++;
 
-    function removeTeamMember(button) {
-        button.closest('.team-member-item').remove();
-    }
-</script>
+            // Update tombol Add Member
+            const addButton = container.nextElementSibling;
+            if (addButton && addButton.textContent.includes('Add Member')) {
+                addButton.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest'
+                });
+            }
+        }
+
+        function removeTeamMember(button) {
+            button.closest('.team-member-item').remove();
+        }
+    </script>
 @endpush
 
 @push('styles')
-<style>
-    .impact-metric-item,
-    .team-member-item {
-        padding: 1rem;
-        background-color: #f9fafb;
-        border-radius: 0.75rem;
-        border: 1px solid #e5e7eb;
-    }
-    
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    
-    input[type="number"] {
-        -moz-appearance: textfield;
-    }
-</style>
+    <style>
+        .impact-metric-item,
+        .team-member-item {
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
 @endpush

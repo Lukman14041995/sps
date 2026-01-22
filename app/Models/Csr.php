@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Storage;
 
 class Csr extends Model
 {
@@ -200,7 +199,7 @@ class Csr extends Model
     public function getFeaturedImageUrlAttribute()
     {
         if ($this->featured_image) {
-            return Storage::disk('s3')->url($this->featured_image);
+            return asset('storage/'.$this->featured_image);
         }
 
         // Default images based on category
@@ -210,7 +209,8 @@ class Csr extends Model
             'quality' => 'https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
         ];
 
-        return $defaultImages[$this->category] ?? 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+        return $defaultImages[$this->category]
+            ?? 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
     }
 
     /**
@@ -219,7 +219,7 @@ class Csr extends Model
     public function getThumbnailImageUrlAttribute()
     {
         if ($this->thumbnail_image) {
-            return Storage::disk('s3')->url($this->thumbnail_image);
+            return asset('storage/'.$this->thumbnail_image);
         }
 
         return $this->featured_image_url;
@@ -228,16 +228,17 @@ class Csr extends Model
     /**
      * Get gallery images URLs
      */
-    public function getGalleryImagesUrlsAttribute()
-    {
-        if (! $this->gallery_images) {
-            return [];
-        }
-
-        return array_map(function ($image) {
-            return Storage::disk('s3')->url($image);
-        }, $this->gallery_images);
+   public function getGalleryImagesUrlsAttribute()
+{
+    if (! $this->gallery_images || !is_array($this->gallery_images)) {
+        return [];
     }
+
+    return array_map(function ($image) {
+        return asset('storage/' . $image);
+    }, $this->gallery_images);
+}
+
 
     /**
      * Get user who created the CSR

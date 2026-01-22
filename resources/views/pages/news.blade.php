@@ -175,9 +175,10 @@
                         <div class="lg:flex">
                             <!-- Image Column -->
                             <div class="lg:w-1/2 relative">
-                                <img src="{{ Storage::disk('s3')->url($featuredNews->thumbnail_image) }}"
+                                <img src="{{ asset('storage/' . $featuredNews->thumbnail_image) }}"
                                     class="w-full h-64 sm:h-72 lg:h-full object-cover" alt="{{ $featuredNews->title }}"
                                     loading="lazy">
+
                                 <a href="{{ route('frontend.news.show', $featuredNews->slug) }}"
                                     class="hover:text-blue-600 transition-colors">
                             </div>
@@ -295,7 +296,7 @@
                                 <!-- Image Container -->
                                 <div class="relative overflow-hidden">
                                     <img src="{{ $news->thumbnail_image
-                                        ? Storage::disk('s3')->url($news->thumbnail_image)
+                                        ? asset('storage/' . $news->thumbnail_image)
                                         : 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}"
                                         class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
                                         alt="{{ $news->title }}" loading="lazy"
@@ -487,7 +488,7 @@
                                 <!-- Image -->
                                 <div class="relative">
                                     <img src="{{ $news->thumbnail_image
-                                        ? Storage::disk('s3')->url($news->thumbnail_image)
+                                        ? asset('storage/' . $news->thumbnail_image)
                                         : 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}"
                                         class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700"
                                         alt="{{ $news->title }}" loading="lazy"

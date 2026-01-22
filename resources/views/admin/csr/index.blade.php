@@ -469,8 +469,8 @@
                             data-year="{{ $csr->year }}" data-created="{{ $csr->created_at }}">
                             <!-- Image -->
                             <div class="relative overflow-hidden">
-                                <img src="{{ Storage::disk('s3')->url($csr->featured_image) }}"
-                                    alt="{{ $csr->title }}" class="w-full h-48 csr-image" />
+                                <img src="{{ asset('storage/' . $csr->featured_image) }}" alt="{{ $csr->title }}"
+                                    class="w-full h-48 csr-image" />
 
                                 <!-- Status Badge -->
                                 <div class="absolute top-4 left-4">
