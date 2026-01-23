@@ -3,64 +3,106 @@
 @section('title', 'Tambah Menu')
 
 @section('content')
-<div class="p-6 bg-gray-900 rounded-lg shadow max-w-lg mx-auto">
-    <h2 class="text-xl font-bold mb-4 text-white">Tambah Menu</h2>
+    <div class="w-full bg-gray-50 px-2 sm:px-6 lg:px-8 py-4 sm:py-8">
 
-    <form action="{{ route('admin.menus.store') }}" method="POST">
-        @csrf
-
-        <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-200">Title</label>
-            <input type="text" name="title" value="{{ old('title') }}"
-                   class="w-full border border-gray-700 bg-gray-800 text-gray-200 px-3 py-2 rounded" required>
+        {{-- ================= HEADER ================= --}}
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm mb-4 px-3 sm:px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold text-gray-900">Tambah Menu</h1>
+                    <p class="text-gray-500 text-xs sm:text-sm">Tambahkan menu atau submenu baru</p>
+                </div>
+                <a href="{{ route('admin.menus.index') }}"
+                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs sm:text-sm transition">
+                    <i class="fas fa-arrow-left mr-1"></i> Kembali
+                </a>
+            </div>
         </div>
 
-        <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-200">Route</label>
-            <input type="text" name="route" value="{{ old('route') }}"
-                   class="w-full border border-gray-700 bg-gray-800 text-gray-200 px-3 py-2 rounded">
-        </div>
+        {{-- ================= FORM (FULL WIDTH) ================= --}}
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 w-full">
 
-        <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-200">Icon (FontAwesome)</label>
-            <input type="text" name="icon" value="{{ old('icon') }}"
-                   class="w-full border border-gray-700 bg-gray-800 text-gray-200 px-3 py-2 rounded">
-        </div>
+            <form action="{{ route('admin.menus.store') }}" method="POST" class="space-y-5">
+                @csrf
 
-        <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-200">Roles (pisahkan koma)</label>
-            <input type="text" name="roles" value="{{ old('roles') }}"
-                   class="w-full border border-gray-700 bg-gray-800 text-gray-200 px-3 py-2 rounded">
-        </div>
+                {{-- TITLE --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <input type="text" name="title" value="{{ old('title') }}" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2
+                              focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm">
+                </div>
 
-        <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-200">Order</label>
-            <input type="number" name="order" value="{{ old('order', 0) }}"
-                   class="w-full border border-gray-700 bg-gray-800 text-gray-200 px-3 py-2 rounded">
-        </div>
+                {{-- ROUTE --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Route</label>
+                    <input type="text" name="route" value="{{ old('route') }}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2
+                              focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm"
+                        placeholder="contoh: admin.users.index">
+                    <p class="text-xs text-gray-500 mt-1">Kosongkan jika menu hanya parent</p>
+                </div>
 
-        <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-200">Parent Menu</label>
-            <select name="parent_id" class="w-full border border-gray-700 bg-gray-800 text-gray-200 px-3 py-2 rounded">
-                <option value="">— None —</option>
-                @foreach($parents as $parent)
-                    <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                        {{ $parent->title }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+                {{-- ICON + PREVIEW --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Icon (FontAwesome)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="text" name="icon" id="iconInput" value="{{ old('icon') }}"
+                            class="flex-1 border border-gray-300 rounded-lg px-3 py-2
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm"
+                            placeholder="fas fa-users">
+                        <div class="w-10 h-10 rounded-lg border flex items-center justify-center bg-gray-50">
+                            <i id="iconPreview" class="{{ old('icon') ?: 'fas fa-circle-question' }} text-gray-600"></i>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="mb-4">
-            <label class="block mb-1 font-medium text-gray-200">Count (optional)</label>
-            <input type="number" name="count" value="{{ old('count') }}"
-                   class="w-full border border-gray-700 bg-gray-800 text-gray-200 px-3 py-2 rounded">
-        </div>
+                {{-- PARENT --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Parent Menu</label>
+                    <select name="parent_id"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2
+                               focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm">
+                        <option value="">— Menu Utama —</option>
+                        @foreach ($parents as $parent)
+                            <option value="{{ $parent->id }}" {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
+                                {{ $parent->title }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-            Simpan
-        </button>
-        <a href="{{ route('admin.menus.index') }}" class="ml-2 text-gray-300 hover:underline">Batal</a>
-    </form>
-</div>
+                {{-- COUNT --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Count (optional)</label>
+                    <input type="number" name="count" value="{{ old('count') }}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2
+                              focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm">
+                </div>
+
+                {{-- ACTION --}}
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+
+                    <a href="{{ route('admin.menus.index') }}"
+                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm transition">
+                        Batal
+                    </a>
+
+                    <button type="submit"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition">
+                        <i class="fas fa-save mr-1"></i> Simpan Menu
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    {{-- ================= JS ================= --}}
+    <script>
+        document.getElementById('iconInput').addEventListener('input', function() {
+            const preview = document.getElementById('iconPreview');
+            preview.className = this.value || 'fas fa-circle-question';
+        });
+    </script>
 @endsection

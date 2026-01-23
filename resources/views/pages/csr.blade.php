@@ -2,17 +2,18 @@
 
 @section('content')
 
-<!-- Hero Section Responsif -->
+{{-- ================= HERO CSR ================= --}}
 <section class="relative bg-blue-900">
-    <!-- Container dengan height yang terkontrol -->
-    <div class="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] overflow-hidden">
+    <div class="relative w-full h-[65vh] -mt-20 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950">
+
         <!-- Background Image -->
         <div class="absolute inset-0">
             <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
                 class="w-full h-full object-cover"
                 alt="SPS Corporate CSR"
-                style="object-position: center 30%;"
+                style="object-position:center 30%;"
                 loading="lazy">
+
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-800/70 to-transparent"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-transparent to-blue-900/80"></div>
@@ -22,24 +23,30 @@
         <div class="relative h-full flex items-center justify-center">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center max-w-3xl mx-auto">
-                    <!-- Title -->
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
-                        Corporate Social
-                        <span class="block text-blue-300 mt-2 sm:mt-3">Responsibility</span>
+
+                    <!-- TITLE -->
+                    <h1
+                        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl
+                               font-bold text-white mb-4 leading-tight">
+                        SPS Corporate
+                        <span class="block text-blue-300 mt-2 sm:mt-3">CSR</span>
                     </h1>
 
-                    <!-- Divider -->
+                    <!-- DIVIDER -->
                     <div class="w-20 h-1.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full mx-auto mb-6"></div>
 
-                    <!-- Description -->
-                    <p class="text-base sm:text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+                    <!-- DESCRIPTION -->
+                    {{-- <p class="text-base sm:text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
                         Komitmen SPS Corporate dalam memberikan dampak positif bagi masyarakat dan lingkungan
-                    </p>
+                    </p> --}}
+
                 </div>
             </div>
         </div>
+
     </div>
 </section>
+
 
 <!-- About CSR Section -->
 <section class="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50">

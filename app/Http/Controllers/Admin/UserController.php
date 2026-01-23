@@ -11,10 +11,39 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    // public function index()
+    // {
+    //     return view('admin.users.index', [
+    //         'users' => User::with('roles')->latest()->paginate(10)
+    //     ]);
+    // }
     public function index()
     {
+        // Data untuk tabel (paginated)
+        $users = User::with('roles')
+            ->latest()
+            ->paginate(10);
+
+        // Data untuk statistik (semua data)
+        $totalUsers = User::count();
+        $adminCount = User::whereHas('roles', function ($query) {
+            $query->where('name', 'admin');
+        })->count();
+
+        $hrCount = User::whereHas('roles', function ($query) {
+            $query->where('name', 'hr');
+        })->count();
+
+        $marketingCount = User::whereHas('roles', function ($query) {
+            $query->where('name', 'marketing');
+        })->count();
+
         return view('admin.users.index', [
-            'users' => User::with('roles')->latest()->get()
+            'users' => $users,
+            'totalUsers' => $totalUsers,
+            'adminCount' => $adminCount,
+            'hrCount' => $hrCount,
+            'marketingCount' => $marketingCount
         ]);
     }
 
@@ -49,7 +78,7 @@ class UserController extends Controller
 
         return redirect()
             ->route('admin.users.index')
-            ->with('success', 'User berhasil dibuat & email aktivasi dikirim.');
+            ->with('success', 'User berhasil dibuat');
     }
 
     // ✅ Tambahkan method edit

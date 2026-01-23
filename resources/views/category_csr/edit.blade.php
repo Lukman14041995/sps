@@ -1,21 +1,28 @@
 @extends('admin.layouts.app')
 
+@section('title', 'Edit Category CSR')
+
 @section('content')
-<div class="p-6 max-w-2xl">
+    <div class="w-full bg-gray-50 px-2 sm:px-6 lg:px-8 py-4 sm:py-8">
 
-    {{-- Header --}}
-    <div class="mb-6">
-        <h1 class="text-2xl font-semibold text-white">Edit Category CSR</h1>
-        <p class="text-sm text-gray-400 mt-1">Perbarui data kategori CSR</p>
-    </div>
+        {{-- ================= HEADER ================= --}}
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm mb-4 px-3 sm:px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold text-gray-900">Edit Category CSR</h1>
+                    <p class="text-gray-500 text-xs sm:text-sm">Perbarui data kategori CSR</p>
+                </div>
+                <a href="{{ route('admin.category-csr.index') }}"
+                    class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs sm:text-sm transition">
+                    <i class="fas fa-arrow-left mr-1"></i> Kembali
+                </a>
+            </div>
+        </div>
 
-    {{-- Form Card --}}
-    <div class="bg-gray-800 rounded-lg shadow p-6">
-
-        {{-- Error Validation --}}
+        {{-- ================= ERROR ALERT ================= --}}
         @if ($errors->any())
-            <div class="mb-4 bg-red-600 text-white px-4 py-3 rounded">
-                <ul class="list-disc list-inside text-sm">
+            <div class="mb-4 bg-red-100 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm">
+                <ul class="list-disc ml-5 space-y-1">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -23,48 +30,50 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.category-csr.update', $item->id) }}" method="POST">
-            @csrf
-            @method('PUT')
+        {{-- ================= FORM ================= --}}
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 sm:p-6 w-full">
 
-            {{-- Nama Kategori --}}
-            <div class="mb-5">
-                <label class="block text-sm font-medium text-gray-300 mb-1">
-                    Nama Kategori <span class="text-red-500">*</span>
-                </label>
-                <input type="text" name="nama_kategori"
-                       value="{{ old('nama_kategori', $item->nama_kategori) }}"
-                       required
-                       class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600
-                              focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
-            </div>
+            <form action="{{ route('admin.category-csr.update', $item->id) }}" method="POST" class="space-y-5">
+                @csrf
+                @method('PUT')
 
-            {{-- Keterangan --}}
-            <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-300 mb-1">
-                    Keterangan
-                </label>
-                <textarea name="keterangan" rows="4"
-                    class="w-full px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600
-                           focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">{{ old('keterangan', $item->keterangan) }}</textarea>
-            </div>
+                {{-- NAMA KATEGORI --}}
+                <div>
+                    <label class="block mb-1 text-sm font-medium text-gray-700">
+                        Nama Kategori <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="nama_kategori" value="{{ old('nama_kategori', $item->nama_kategori) }}"
+                        required
+                        class="w-full px-3 py-2 rounded-lg border border-gray-300
+                              focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm">
+                </div>
 
-            {{-- Action --}}
-            <div class="flex items-center justify-between">
-                <a href="{{ route('admin.category-csr.index') }}"
-                   class="text-gray-300 hover:text-white transition">
-                    ← Kembali
-                </a>
+                {{-- KETERANGAN --}}
+                <div>
+                    <label class="block mb-1 text-sm font-medium text-gray-700">
+                        Keterangan
+                    </label>
+                    <textarea name="keterangan" rows="4"
+                        class="w-full px-3 py-2 rounded-lg border border-gray-300
+                                 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 text-sm">{{ old('keterangan', $item->keterangan) }}</textarea>
+                </div>
 
-                <button type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition">
-                    Update
-                </button>
-            </div>
+                {{-- ACTION --}}
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
 
-        </form>
+                    <a href="{{ route('admin.category-csr.index') }}"
+                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm transition">
+                        Kembali
+                    </a>
 
+                    <button type="submit"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition">
+                        <i class="fas fa-save mr-1"></i> Update
+                    </button>
+
+                </div>
+
+            </form>
+        </div>
     </div>
-
-</div>
 @endsection

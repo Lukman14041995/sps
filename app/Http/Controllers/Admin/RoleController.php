@@ -9,9 +9,16 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
+    // public function index()
+    // {
+    //     return view('admin.roles.index', ['roles' => Role::all()]);
+    // }
+
     public function index()
     {
-        return view('admin.roles.index', ['roles' => Role::all()]);
+        $roles = Role::with(['menus', 'users'])->get();
+
+        return view('admin.roles.index', compact('roles'));
     }
 
     public function create()
@@ -46,5 +53,14 @@ class RoleController extends Controller
         $role->menus()->detach();
         $role->delete();
         return redirect()->route('admin.roles.index')->with('success', 'Role berhasil dihapus');
+    }
+
+    public function checkSlug(Request $request)
+    {
+        $exists = Role::where('slug', $request->slug)->exists();
+
+        return response()->json([
+            'exists' => $exists
+        ]);
     }
 }

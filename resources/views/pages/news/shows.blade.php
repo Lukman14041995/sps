@@ -18,14 +18,18 @@
     }
 @endphp
 
-<!-- Hero Section Detail dengan padding-top untuk menghindari header -->
-<section class="relative bg-blue-900 pt-20"> <!-- Tambahkan pt-20 di sini -->
-    <div class="relative h-[200px] sm:h-[250px] md:h-[300px] overflow-hidden">
+{{-- ================= HERO DETAIL ================= --}}
+<section class="relative bg-blue-900">
+    <div class="relative w-full h-[65vh] -mt-20 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950">
+
         <!-- Background Image -->
         <div class="absolute inset-0">
             <img src="{{ getNewsImageUrl($news->thumbnail_image) }}"
-                class="w-full h-full object-cover" alt="{{ $news->title }}"
-                style="object-position: center 30%;" loading="lazy">
+                class="w-full h-full object-cover"
+                alt="{{ $news->title }}"
+                style="object-position:center 30%;"
+                loading="lazy">
+
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-800/70 to-transparent"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-transparent to-blue-900/80"></div>
@@ -35,25 +39,39 @@
         <div class="relative h-full flex items-center justify-center">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center max-w-4xl mx-auto">
-                    <!-- Title dengan margin top yang cukup -->
-                    <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 leading-tight mt-4 sm:mt-0">
+
+                    <!-- TITLE -->
+                    <h1
+                        class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl
+                               font-bold text-white mb-4 leading-tight">
                         {{ $news->title }}
                     </h1>
 
-                    <!-- Meta Info -->
-                    <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-white/90 text-xs sm:text-sm md:text-base">
-                        @if($news->category)
-                        <div class="flex items-center">
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
-                            </svg>
-                            <span class="font-medium">{{ $news->category->name }}</span>
-                        </div>
+                    <!-- DIVIDER -->
+                    <div class="w-20 h-1.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full mx-auto mb-5"></div>
+
+                    <!-- META INFO -->
+                    <div
+                        class="flex flex-wrap items-center justify-center gap-3 sm:gap-4
+                               text-white/90 text-xs sm:text-sm md:text-base">
+
+                        @if ($news->category)
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+                                </svg>
+                                <span class="font-medium">{{ $news->category->name }}</span>
+                            </div>
                         @endif
-                        
+
+                        <!-- READ TIME -->
                         <div class="flex items-center">
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             @php
                                 $wordCount = str_word_count(strip_tags($news->content));
@@ -61,27 +79,42 @@
                             @endphp
                             <span>{{ $readingTime }} min read</span>
                         </div>
-                        
+
+                        <!-- DATE -->
                         <div class="flex items-center">
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <span>{{ $news->published_at ? $news->published_at->format('d M Y') : $news->created_at->format('d M Y') }}</span>
+                            <span>
+                                {{ $news->published_at
+                                    ? $news->published_at->format('d M Y')
+                                    : $news->created_at->format('d M Y') }}
+                            </span>
                         </div>
-                        
+
+                        <!-- VIEWS -->
                         <div class="flex items-center">
-                            <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                             <span>{{ number_format($news->views) }} views</span>
                         </div>
+
                     </div>
+
                 </div>
             </div>
         </div>
+
     </div>
 </section>
+
 
 <!-- Main Content -->
 <section class="py-8 sm:py-12 md:py-16 bg-white">
