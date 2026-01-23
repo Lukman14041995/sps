@@ -75,9 +75,9 @@
                 <div>
                     <h4 class="font-semibold mb-4 text-gray-300">Connect</h4>
                     <div class="flex space-x-3">
-                        <a href="#" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                        {{-- <a href="#" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
                             <span class="text-sm">f</span>
-                        </a>
+                        </a> --}}
                         <a href="#" class="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors">
                             <span class="text-sm">ig</span>
                         </a>
@@ -88,12 +88,12 @@
                 </div>
 
                 <!-- Legal -->
-                <div class="pt-6 border-t border-gray-800">
+                {{-- <div class="pt-6 border-t border-gray-800">
                     <ul class="space-y-2">
                         <li><a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a></li>
                     </ul>
-                </div>
+                </div> --}}
             </div>
         </div>
 
@@ -103,9 +103,9 @@
                 <div>
                     © {{ date('Y') }} SPS Corporate. All rights reserved.
                 </div>
-                <div class="mt-2 md:mt-0">
+                {{-- <div class="mt-2 md:mt-0">
                     PT SPS Corporate • Reg. No: 0123.456.789
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

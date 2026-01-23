@@ -2,64 +2,69 @@
 
 @section('content')
 
-    <!-- Hero Section -->
+    {{-- ================= HERO DETAIL CSR ================= --}}
     <section class="relative bg-blue-900">
-        <div class="relative h-[250px] sm:h-[300px] md:h-[350px] overflow-hidden">
-            <div class="absolute inset-0">
-                <img src="{{ asset('storage/' . $csr->featured_image) }}" class="w-full h-full object-cover"
-                    alt="{{ $csr->title }}" style="object-position: center center;" loading="lazy">
+        <div class="relative w-full h-[65vh] -mt-20 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950">
 
+            <!-- Background Image -->
+            <div class="absolute inset-0">
+                <img src="{{ Storage::disk('s3')->url($csr->featured_image) }}" class="w-full h-full object-cover"
+                    alt="{{ $csr->title }}" style="object-position:center 30%;" loading="lazy">
+
+                <!-- Gradient Overlay -->
                 <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-800/70 to-transparent"></div>
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-transparent to-blue-900/80"></div>
             </div>
 
+            <!-- Content -->
             <div class="relative h-full flex items-end">
-                <div class="container mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-                    <div class="max-w-4xl">
-                        <!-- Breadcrumb -->
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+                    <div class="max-w-4xl text-white">
+
+                        <!-- BREADCRUMB -->
                         <nav class="mb-4">
-                            <ol class="flex items-center space-x-2 text-white/80 text-sm">
+                            <ol class="flex flex-wrap items-center text-white/80 text-sm gap-1">
                                 <li>
-                                    <a href="{{ route('frontend.home') }}"
-                                        class="hover:text-white transition-colors">Home</a>
+                                    <a href="{{ route('frontend.home') }}" class="hover:text-white transition">
+                                        Home
+                                    </a>
                                 </li>
-                                <li class="flex items-center">
-                                    <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    <a href="{{ route('frontend.csr.index') }}"
-                                        class="hover:text-white transition-colors">CSR</a>
+                                <li class="mx-1">/</li>
+                                <li>
+                                    <a href="{{ route('frontend.csr.index') }}" class="hover:text-white transition">
+                                        CSR
+                                    </a>
                                 </li>
-                                <li class="flex items-center">
-                                    <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd"
-                                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                                            clip-rule="evenodd" />
-                                    </svg>
-                                    <span class="font-medium text-white">{{ $csr->title }}</span>
+                                <li class="mx-1">/</li>
+                                <li class="font-semibold text-white line-clamp-1">
+                                    {{ $csr->title }}
                                 </li>
                             </ol>
                         </nav>
 
-                        <!-- Title -->
-                        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
+                        <!-- TITLE -->
+                        <h1
+                            class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl
+                               font-bold leading-tight mb-3">
                             {{ $csr->title }}
                         </h1>
 
-                        <!-- Meta Information -->
-                        <div class="flex flex-wrap items-center gap-4 text-white/80 text-sm">
-                            <span class="flex items-center">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- META -->
+                        <div class="flex flex-wrap items-center gap-4 text-white/85 text-sm">
+
+                            <!-- DATE -->
+                            <span class="flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                                 {{ \Carbon\Carbon::parse($csr->created_at)->translatedFormat('d F Y') }}
                             </span>
+
+                            <!-- LOCATION -->
                             @if ($csr->location)
-                                <span class="flex items-center">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -68,15 +73,21 @@
                                     {{ $csr->location }}
                                 </span>
                             @endif
-                            <span class="px-2 py-1 bg-white/20 rounded-full text-xs">
+
+                            <!-- CATEGORY -->
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-semibold">
                                 {{ $categories[$csr->category]['name'] ?? $csr->category }}
                             </span>
+
                         </div>
+
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
+
 
     <!-- CSR Detail Content -->
     <section class="py-12 sm:py-16 md:py-20 bg-white">
@@ -87,9 +98,8 @@
                     <div class="lg:col-span-2">
                         <!-- Featured Image -->
                         <div class="rounded-xl overflow-hidden mb-8">
-                            <img src="{{ asset('storage/' . $csr->featured_image) }}"
+                            <img src="{{ Storage::disk('s3')->url($csr->featured_image) }}"
                                 class="w-full h-auto max-h-[400px] object-cover" alt="{{ $csr->title }}" loading="lazy">
-
                         </div>
 
                         <!-- Content -->

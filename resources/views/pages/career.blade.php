@@ -2,17 +2,18 @@
 
 @section('content')
 
-<!-- Hero Section -->
+{{-- ================= HERO CAREER ================= --}}
 <section class="relative bg-blue-900">
-    <!-- Container dengan height yang terkontrol -->
-    <div class="relative h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px] overflow-hidden">
+    <div class="relative w-full h-[65vh] -mt-20 overflow-hidden bg-gradient-to-br from-gray-900 to-gray-950">
+
         <!-- Background Image -->
         <div class="absolute inset-0">
             <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
                 class="w-full h-full object-cover"
                 alt="SPS Corporate Career"
-                style="object-position: center 30%;"
+                style="object-position:center 30%;"
                 loading="lazy">
+
             <!-- Gradient Overlay -->
             <div class="absolute inset-0 bg-gradient-to-t from-blue-900/90 via-blue-800/70 to-transparent"></div>
             <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-transparent to-blue-900/80"></div>
@@ -22,47 +23,33 @@
         <div class="relative h-full flex items-center justify-center">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center max-w-3xl mx-auto">
-                    <!-- Breadcrumb -->
-                    <!-- <nav class="mb-4 sm:mb-6 hidden sm:block">
-                        <ol class="flex items-center justify-center space-x-2 text-white/80 text-sm">
-                            <li>
-                                <a href="/" class="hover:text-white transition-colors duration-300">Home</a>
-                            </li>
-                            <li class="flex items-center">
-                                <svg class="w-4 h-4 mx-2" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                                <span class="font-medium text-white">Career</span>
-                            </li>
-                        </ol>
-                    </nav> -->
 
-                    <!-- Badge -->
-                    <!-- <div class="inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6 border border-white/20">
-                        <svg class="w-5 h-5 mr-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        <span class="text-white font-medium tracking-wider">JOIN OUR TEAM</span>
-                    </div> -->
-
-                    <!-- Title -->
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                    <!-- TITLE -->
+                    <h1
+                        class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl
+                               font-bold text-white mb-4 leading-tight">
                         Grow Your Career
-                        <span class="block text-blue-300 mt-2 sm:mt-3">With SPS Corporate</span>
+                        <span class="block text-blue-300 mt-2 sm:mt-3">
+                            With SPS Corporate
+                        </span>
                     </h1>
 
-                    <!-- Divider -->
+                    <!-- DIVIDER -->
                     <div class="w-20 h-1.5 bg-gradient-to-r from-blue-400 to-blue-300 rounded-full mx-auto mb-6"></div>
 
-                    <!-- Description -->
-                    <p class="text-base sm:text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
-                        Bergabunglah dengan tim inovatif kami dan kembangkan potensi terbaik Anda dalam lingkungan yang dinamis dan suportif
-                    </p>
+                    <!-- DESCRIPTION -->
+                    {{-- <p class="text-base sm:text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+                        Bergabunglah dengan tim inovatif kami dan kembangkan potensi terbaik Anda
+                        dalam lingkungan yang dinamis dan suportif
+                    </p> --}}
+
                 </div>
             </div>
         </div>
+
     </div>
 </section>
+
 
 <!-- Why Join Section -->
 <section id="why-join" class="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50">

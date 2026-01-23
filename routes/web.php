@@ -45,6 +45,9 @@ Route::controller(PageController::class)
         Route::get('/career/{id}', 'careerDetail')->name('career.show'); // Tambahkan route detail
         Route::get('/contact', 'contact')->name('contact');
     });
+
+
+
 /*
 |--------------------------------------------------------------------------
 | UPLOAD ROUTES (Untuk semua yang memerlukan upload)
@@ -156,7 +159,7 @@ Route::prefix('admin')
             Route::get('/{news}', [AdminNewsController::class, 'show'])->name('show');
             Route::get('/{news}/edit', [AdminNewsController::class, 'edit'])->name('edit');
             Route::put('/{news}', [AdminNewsController::class, 'update'])->name('update');
-            Route::patch('/{news}', [AdminNewsController::class, 'update'])->name('update');
+            // Route::patch('/{news}', [AdminNewsController::class, 'update'])->name('update');
             Route::delete('/{news}', [AdminNewsController::class, 'destroy'])->name('destroy');
             Route::post('/bulk-action', [AdminNewsController::class, 'bulkAction'])->name('bulk-action');
             Route::post('/{news}/update-status', [AdminNewsController::class, 'updateStatus'])->name('update-status');
@@ -183,9 +186,17 @@ Route::prefix('admin')
         Route::resource('category-csr', CategoryCsrController::class);
         Route::resource('category-loker', CategoryLokerController::class);
         Route::resource('bisnis-kategori', BisnisKategoriController::class);
-           Route::resource('bisnis-unit', BusinessUnitController::class);
-            Route::resource('menus', MenuController::class);
-            Route::resource('roles',RoleController::class);
+        Route::resource('bisnis-unit', BusinessUnitController::class);
+
+        Route::resource('menus', MenuController::class);
+        Route::post('menus/reorder', [MenuController::class, 'reorder'])
+            ->name('menus.reorder');
+
+
+        Route::resource('roles', RoleController::class);
+
+        Route::post('roles/check-slug', [RoleController::class, 'checkSlug'])
+            ->name('roles.check-slug');
     });
 
 require __DIR__ . '/auth.php';
