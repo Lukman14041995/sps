@@ -10,18 +10,23 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         if (!$user) {
-            abort(403);
+            abort(401);
         }
 
-        foreach ($roles as $role) {
-            if ($user->hasRole($role)) {
-                return $next($request);
-            }
+        // pastikan relasi ada
+        $user->loadMissing('roles');
+
+        if ($user->super) {
+            return $next($request);
         }
 
-        abort(403, 'Anda tidak memiliki akses.');
+        if (!$user->hasAnyRole($roles)) {
+            abort(403, 'Anda tidak memiliki izin.');
+        }
+
+        return $next($request);
     }
 }

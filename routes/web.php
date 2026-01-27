@@ -105,71 +105,67 @@ Route::middleware('auth')->group(function () {
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'menu.access']) // 🔥 DINAMIS BERDASARKAN menu_role
     ->group(function () {
 
-        // Dashboard
+        /* ================= DASHBOARD ================= */
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
 
-        // User Management
+
+        /* ================= USERS ================= */
         Route::resource('users', UserController::class);
 
-        // About
+
+        /* ================= ABOUT ================= */
         Route::resource('about', AboutController::class)
             ->except('show');
 
-        // Business Units
+
+        /* ================= BUSINESS UNIT ================= */
         Route::resource('business-units', BusinessUnitController::class);
 
-        // CSR
+
+        /* ================= CSR ================= */
         Route::resource('csr', CsrController::class);
+
         Route::get('/csr/{csr}/edit-json', [CsrController::class, 'editJson'])
             ->name('csr.edit.json');
+
         Route::post('/csr/bulk-action', [CsrController::class, 'bulkAction'])
             ->name('csr.bulk-action');
 
-        // Career
-        Route::resource('career', CareerController::class)->names([
-            'index' => 'career.index',
-            'create' => 'career.create',
-            'store' => 'career.store',
-            'show' => 'career.show',
-            'edit' => 'career.edit',
-            'update' => 'career.update',
-            'destroy' => 'career.destroy',
-        ]);
 
-        // Contact
+        /* ================= CAREER ================= */
+        Route::resource('career', CareerController::class);
+
+
+        /* ================= CONTACT ================= */
         Route::resource('contact', ContactController::class)
             ->except(['create', 'store']);
 
-        /*
-        |--------------------------------------------------------------------------
-        | NEWS
-        |--------------------------------------------------------------------------
-        */
+
+        /* ================= NEWS ================= */
         Route::prefix('news')->name('news.')->group(function () {
+
             Route::get('/', [AdminNewsController::class, 'index'])->name('index');
             Route::get('/create', [AdminNewsController::class, 'create'])->name('create');
             Route::post('/', [AdminNewsController::class, 'store'])->name('store');
             Route::get('/{news}', [AdminNewsController::class, 'show'])->name('show');
             Route::get('/{news}/edit', [AdminNewsController::class, 'edit'])->name('edit');
-            Route::put('/{news}', [AdminNewsController::class, 'update'])->name('update');
-            Route::patch('/{news}', [AdminNewsController::class, 'update'])->name('update');
+            Route::match(['put', 'patch'], '/{news}', [AdminNewsController::class, 'update'])->name('update');
             Route::delete('/{news}', [AdminNewsController::class, 'destroy'])->name('destroy');
+
             Route::post('/bulk-action', [AdminNewsController::class, 'bulkAction'])->name('bulk-action');
             Route::post('/{news}/update-status', [AdminNewsController::class, 'updateStatus'])->name('update-status');
             Route::post('/preview', [AdminNewsController::class, 'preview'])->name('preview');
             Route::post('/generate-slug', [AdminNewsController::class, 'generateSlug'])->name('generate-slug');
         });
 
-        /*
-        |--------------------------------------------------------------------------
-        | NEWS CATEGORIES
-        |--------------------------------------------------------------------------
-        */
+
+        /* ================= NEWS CATEGORIES ================= */
         Route::prefix('news-categories')->name('news-categories.')->group(function () {
+
             Route::get('/', [NewsCategoryController::class, 'index'])->name('index');
             Route::post('/', [NewsCategoryController::class, 'store'])->name('store');
             Route::post('/update-order', [NewsCategoryController::class, 'updateOrder'])->name('update-order');
@@ -178,14 +174,22 @@ Route::prefix('admin')
             Route::get('/stats', [NewsCategoryController::class, 'stats'])->name('stats');
             Route::delete('/{id}', [NewsCategoryController::class, 'destroy'])->name('destroy');
         });
-        // MASTER CATEGORY CSR
-        // ===============================
+
+
+        /* ================= MASTER DATA ================= */
         Route::resource('category-csr', CategoryCsrController::class);
         Route::resource('category-loker', CategoryLokerController::class);
         Route::resource('bisnis-kategori', BisnisKategoriController::class);
-           Route::resource('bisnis-unit', BusinessUnitController::class);
-            Route::resource('menus', MenuController::class);
-            Route::resource('roles',RoleController::class);
+        Route::resource('bisnis-unit', BusinessUnitController::class);
+
+
+        /* ================= RBAC ================= */
+        Route::resource('menus', MenuController::class);
+        Route::resource('roles', RoleController::class);
+
     });
+
+
+
 
 require __DIR__ . '/auth.php';
