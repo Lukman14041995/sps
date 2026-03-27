@@ -39,8 +39,8 @@ class MenuController extends Controller
 
     public function edit(Menu $menu)
     {
-        $parents = Menu::whereNull('parent_id')->where('id','!=',$menu->id)->get();
-        return view('admin.menus.edit', compact('menu','parents'));
+        $parents = Menu::whereNull('parent_id')->where('id', '!=', $menu->id)->get();
+        return view('admin.menus.edit', compact('menu', 'parents'));
     }
 
     public function update(Request $request, Menu $menu)
@@ -65,5 +65,13 @@ class MenuController extends Controller
         $menu->delete();
         return redirect()->route('admin.menus.index')->with('success', 'Menu berhasil dihapus.');
     }
-}
 
+    public function reorder(Request $request)
+    {
+        foreach ($request->orders as $order => $id) {
+            Menu::where('id', $id)->update(['order' => $order + 1]);
+        }
+
+        return response()->json(['status' => 'ok']);
+    }
+}

@@ -12,7 +12,22 @@ class PageController extends Controller
 {
     public function home()
     {
-        return view('pages.home');
+        // Query dasar (kalau mau dipakai lagi nanti)
+        $query = News::with(['category'])
+            ->withTrashed()
+            ->where('status', 'published')
+            ->where(function ($q) {
+                $q->whereNull('deleted_at')
+                    ->orWhere('deleted_at', '>=', now()->subDays(30));
+            });
+
+        // Latest 3 News
+        $latestNews = (clone $query)
+            ->latest('published_at')
+            ->limit(3)
+            ->get();
+
+        return view('pages.home', compact('latestNews'));
     }
 
     public function about()
@@ -114,7 +129,7 @@ class PageController extends Controller
     public function career()
     {
         // Ambil semua lowongan yang aktif
-        $jobListings = Career::where('is_active', true)        
+        $jobListings = Career::where('is_active', true)
             ->orderBy('created_at', 'desc')
             ->get();
 

@@ -1,15 +1,19 @@
 @extends('layouts.frontend')
 
 @section('content')
-<x-hero />
+    <x-hero />
 
-<x-greetings />
+    {{-- <x-greetings /> --}}
 
-<x-about-section />
+    <x-about-section />
 
-<x-business />
+    <x-vision-mission />
 
-<x-logo-section />
+    <x-business />
 
-<x-join-section />
+    <x-logo-section />
+
+    <x-news :latestNews="$latestNews" />
+
+    <x-join-section />
 @endsection

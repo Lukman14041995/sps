@@ -7,6 +7,7 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class NewsCategoryController extends Controller
@@ -36,7 +37,8 @@ class NewsCategoryController extends Controller
     public function index()
     {
         $categories = NewsCategory::orderBy('order')
-            ->orderBy('created_at', 'desc')
+            // ->orderBy('created_at', 'desc')
+            ->orderBy('order')
             ->get(); // 
 
         $totalCategories = $categories->count();
@@ -53,9 +55,33 @@ class NewsCategoryController extends Controller
         ));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $validated = $request->validate([
+    //         'name' => 'required|string|max:255|unique:news_categories,name',
+    //         'slug' => 'required|string|max:255|unique:news_categories,slug',
+    //         'description' => 'nullable|string',
+    //         'order' => 'nullable|integer|min:0',
+    //         'is_active' => 'required|boolean',
+    //     ]);
+
+    //     try {
+    //         NewsCategory::create($validated);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Category created successfully'
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Failed to create category: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:news_categories,name',
             'slug' => 'required|string|max:255|unique:news_categories,slug',
             'description' => 'nullable|string',
@@ -63,20 +89,21 @@ class NewsCategoryController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
-        try {
-            NewsCategory::create($validated);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Category created successfully'
-            ]);
-        } catch (\Exception $e) {
+        if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to create category: ' . $e->getMessage()
-            ], 500);
+                'errors' => $validator->errors()
+            ], 422);
         }
+
+        NewsCategory::create($validator->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Category created successfully'
+        ]);
     }
+
 
     public function updateOrder(Request $request)
     {
@@ -103,54 +130,16 @@ class NewsCategoryController extends Controller
         }
     }
 
-    // public function updateInline(Request $request)
-    // {
-    //     $request->validate([
-    //         'id' => 'required|exists:news_categories,id',
-    //         'field' => 'required|in:name,slug,description,order',
-    //         'value' => 'required'
-    //     ]);
-
-    //     try {
-    //         $category = NewsCategory::findOrFail($request->id);
-
-    //         // Special handling for different fields
-    //         if ($request->field === 'slug') {
-    //             $request->validate([
-    //                 'value' => 'required|string|max:255|unique:news_categories,slug,' . $category->id
-    //             ]);
-    //         } elseif ($request->field === 'name') {
-    //             $request->validate([
-    //                 'value' => 'required|string|max:255|unique:news_categories,name,' . $category->id
-    //             ]);
-    //         } elseif ($request->field === 'order') {
-    //             $request->validate([
-    //                 'value' => 'required|integer|min:0'
-    //             ]);
-    //         }
-
-    //         $category->{$request->field} = $request->value;
-    //         $category->save();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => ucfirst($request->field) . ' updated successfully'
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Failed to update: ' . $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
     public function updateInline(Request $request)
     {
         $request->validate([
             'id' => 'required|exists:news_categories,id',
             'field' => 'required|in:name,slug,description,order',
-            'value' => 'required'
+            'value' => $request->field === 'description'
+                ? 'nullable|string'
+                : 'required'
         ]);
+
 
         try {
             $category = NewsCategory::findOrFail($request->id);
@@ -177,7 +166,8 @@ class NewsCategoryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => ucfirst($request->field) . ' updated successfully'
+                'message' => ucfirst($request->field) . ' updated successfully',
+                'slug' => $category->slug
             ]);
         } catch (\Exception $e) {
             return response()->json([

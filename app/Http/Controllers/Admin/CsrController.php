@@ -172,7 +172,7 @@ class CsrController extends Controller
              */
             if ($request->hasFile('featured_image') && $request->file('featured_image')->isValid()) {
                 $path = $request->file('featured_image')
-                    ->store('csr/featured-images', 's3');
+                    ->store('csr/featured-images', 'public');
                 $validated['featured_image'] = $path;
             }
 
@@ -181,7 +181,7 @@ class CsrController extends Controller
              */
             if ($request->hasFile('thumbnail_image') && $request->file('thumbnail_image')->isValid()) {
                 $path = $request->file('thumbnail_image')
-                    ->store('csr/thumbnail-images', 's3');
+                    ->store('csr/thumbnail-images', 'public');
                 $validated['thumbnail_image'] = $path;
             }
 
@@ -192,7 +192,7 @@ class CsrController extends Controller
             if ($request->hasFile('gallery_images')) {
                 foreach ($request->file('gallery_images') as $image) {
                     if ($image->isValid()) {
-                        $path = $image->store('csr/gallery-images', 's3');
+                        $path = $image->store('csr/gallery-images', 'public');
                         if ($path) {
                             $galleryPaths[] = $path;
                         }
@@ -293,14 +293,14 @@ class CsrController extends Controller
 
             // Clean up uploaded files jika error
             if (isset($validated['featured_image'])) {
-                Storage::disk('s3')->delete($validated['featured_image']);
+                Storage::disk('public')->delete($validated['featured_image']);
             }
             if (isset($validated['thumbnail_image'])) {
-                Storage::disk('s3')->delete($validated['thumbnail_image']);
+                Storage::disk('public')->delete($validated['thumbnail_image']);
             }
             if (isset($galleryPaths) && is_array($galleryPaths)) {
                 foreach ($galleryPaths as $path) {
-                    Storage::disk('s3')->delete($path);
+                    Storage::disk('public')->delete($path);
                 }
             }
 
@@ -478,102 +478,86 @@ class CsrController extends Controller
             'status' => 'required|in:draft,published,archived',
             'sort_order' => 'nullable|integer',
         ]);
-        // dd($validated);
 
         try {
             DB::beginTransaction();
 
-            // Simpan data gambar lama
             $oldFeaturedImage = $csr->featured_image;
             $oldThumbnailImage = $csr->thumbnail_image;
             $oldGalleryImages = $csr->gallery_images ? json_decode($csr->gallery_images, true) : [];
 
-            /**
-             * ✅ FEATURED IMAGE UPDATE (S3/MinIO)
-             */
-            if ($request->hasFile('featured_image') && $request->file('featured_image')->isValid()) {
-                // Upload gambar baru
+            /* ================= FEATURED IMAGE ================= */
+            if ($request->hasFile('featured_image')) {
                 $path = $request->file('featured_image')
-                    ->store('csr/featured-images', 's3');
+                    ->store('csr/featured-images', 'public');
+
                 $validated['featured_image'] = $path;
 
-                // Hapus gambar lama dari S3
-                if ($oldFeaturedImage && Storage::disk('s3')->exists($oldFeaturedImage)) {
-                    Storage::disk('s3')->delete($oldFeaturedImage);
+                if ($oldFeaturedImage && Storage::disk('public')->exists($oldFeaturedImage)) {
+                    Storage::disk('public')->delete($oldFeaturedImage);
                 }
-            } elseif ($request->has('remove_featured_image')) {
-                // Hapus gambar jika checkbox dicentang
-                if ($oldFeaturedImage && Storage::disk('s3')->exists($oldFeaturedImage)) {
-                    Storage::disk('s3')->delete($oldFeaturedImage);
+
+            } elseif ($request->boolean('remove_featured_image')) {
+
+                if ($oldFeaturedImage && Storage::disk('public')->exists($oldFeaturedImage)) {
+                    Storage::disk('public')->delete($oldFeaturedImage);
                 }
+
                 $validated['featured_image'] = null;
+
             } else {
-                // Tetap gunakan gambar lama
                 $validated['featured_image'] = $oldFeaturedImage;
             }
 
-            /**
-             * ✅ THUMBNAIL IMAGE UPDATE (S3/MinIO)
-             */
-            if ($request->hasFile('thumbnail_image') && $request->file('thumbnail_image')->isValid()) {
-                // Upload gambar baru
+            /* ================= THUMBNAIL IMAGE ================= */
+            if ($request->hasFile('thumbnail_image')) {
                 $path = $request->file('thumbnail_image')
-                    ->store('csr/thumbnail-images', 's3');
+                    ->store('csr/thumbnail-images', 'public');
+
                 $validated['thumbnail_image'] = $path;
 
-                // Hapus gambar lama dari S3
-                if ($oldThumbnailImage && Storage::disk('s3')->exists($oldThumbnailImage)) {
-                    Storage::disk('s3')->delete($oldThumbnailImage);
+                if ($oldThumbnailImage && Storage::disk('public')->exists($oldThumbnailImage)) {
+                    Storage::disk('public')->delete($oldThumbnailImage);
                 }
+
             } else {
-                // Tetap gunakan gambar lama
                 $validated['thumbnail_image'] = $oldThumbnailImage;
             }
 
-            /**
-             * ✅ GALLERY IMAGES UPDATE (S3/MinIO)
-             */
+            /* ================= GALLERY IMAGES ================= */
             $galleryPaths = $oldGalleryImages;
 
-            // Hapus gambar yang dipilih
             if ($request->has('remove_gallery_images')) {
-                $imagesToRemove = $request->input('remove_gallery_images', []);
-                foreach ($imagesToRemove as $imagePath) {
-                    if ($imagePath && Storage::disk('s3')->exists($imagePath)) {
-                        Storage::disk('s3')->delete($imagePath);
+                foreach ($request->input('remove_gallery_images', []) as $imagePath) {
+                    if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                        Storage::disk('public')->delete($imagePath);
                     }
+
                     $key = array_search($imagePath, $galleryPaths);
                     if ($key !== false) {
                         unset($galleryPaths[$key]);
                     }
                 }
-                $galleryPaths = array_values($galleryPaths); // Reindex array
+                $galleryPaths = array_values($galleryPaths);
             }
 
-            // Tambah gambar baru
             if ($request->hasFile('gallery_images')) {
                 foreach ($request->file('gallery_images') as $image) {
                     if ($image->isValid()) {
-                        $path = $image->store('csr/gallery-images', 's3');
-                        if ($path) {
-                            $galleryPaths[] = $path;
-                        }
+                        $path = $image->store('csr/gallery-images', 'public');
+                        $galleryPaths[] = $path;
                     }
                 }
             }
 
-            if (! empty($galleryPaths)) {
-                $validated['gallery_images'] = json_encode($galleryPaths);
-            } else {
-                $validated['gallery_images'] = null;
-            }
+            $validated['gallery_images'] = ! empty($galleryPaths)
+                ? json_encode($galleryPaths)
+                : null;
 
-            /**
-             * ✅ IMPACT METRICS
-             */
+            /* ================= IMPACT METRICS ================= */
             if ($request->has('impact_metrics')) {
                 $impactMetrics = [];
-                foreach ($request->input('impact_metrics', []) as $metric) {
+                foreach ($request->impact_metrics as $metric) {
                     if (! empty($metric['name']) && ! empty($metric['value'])) {
                         $impactMetrics[] = [
                             'name' => $metric['name'],
@@ -582,17 +566,15 @@ class CsrController extends Controller
                         ];
                     }
                 }
-                $validated['impact_metrics'] = ! empty($impactMetrics) ? json_encode($impactMetrics) : null;
+                $validated['impact_metrics'] = $impactMetrics ? json_encode($impactMetrics) : null;
             } else {
                 $validated['impact_metrics'] = null;
             }
 
-            /**
-             * ✅ TEAM MEMBERS
-             */
+            /* ================= TEAM MEMBERS ================= */
             if ($request->has('team_members')) {
                 $teamMembers = [];
-                foreach ($request->input('team_members', []) as $member) {
+                foreach ($request->team_members as $member) {
                     if (! empty($member['name']) && ! empty($member['role'])) {
                         $teamMembers[] = [
                             'name' => $member['name'],
@@ -600,31 +582,21 @@ class CsrController extends Controller
                         ];
                     }
                 }
-                $validated['team_members'] = ! empty($teamMembers) ? json_encode($teamMembers) : null;
+                $validated['team_members'] = $teamMembers ? json_encode($teamMembers) : null;
             } else {
                 $validated['team_members'] = null;
             }
 
-            /**
-             * ✅ SLUG UPDATE (jika title berubah)
-             */
+            /* ================= SLUG ================= */
             if ($csr->title !== $validated['title']) {
-                $validated['slug'] = Str::slug($validated['title']);
-
-                // Pastikan slug unik
-                $count = Csr::where('slug', $validated['slug'])
-                    ->where('id', '!=', $csr->id)
-                    ->count();
-                if ($count > 0) {
-                    $validated['slug'] = $validated['slug'].'-'.($count + 1);
-                }
+                $slug = Str::slug($validated['title']);
+                $count = Csr::where('slug', $slug)->where('id', '!=', $csr->id)->count();
+                $validated['slug'] = $count ? $slug.'-'.($count + 1) : $slug;
             } else {
                 $validated['slug'] = $csr->slug;
             }
 
-            /**
-             * ✅ PUBLISH DATE UPDATE
-             */
+            /* ================= PUBLISHED AT ================= */
             if ($validated['status'] === 'published' && $csr->status !== 'published') {
                 $validated['published_at'] = now();
             } elseif ($validated['status'] !== 'published') {
@@ -633,14 +605,8 @@ class CsrController extends Controller
                 $validated['published_at'] = $csr->published_at;
             }
 
-            /**
-             * ✅ UPDATE USER INFORMATION
-             */
             $validated['updated_by'] = Auth::id();
 
-            /**
-             * ✅ UPDATE CSR PROGRAM
-             */
             $csr->update($validated);
 
             DB::commit();
@@ -651,12 +617,10 @@ class CsrController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Log error
             Log::error('CSR Update Error: '.$e->getMessage());
-            Log::error('Trace: '.$e->getTraceAsString());
+            Log::error($e->getTraceAsString());
 
-            return redirect()->back()
-                ->withInput()
+            return back()->withInput()
                 ->with('error', 'Failed to update CSR program: '.$e->getMessage());
         }
     }
